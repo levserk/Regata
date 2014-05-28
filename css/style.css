@@ -1,5 +1,135 @@
 html, body, #map-canvas {
-    height: 100%;
     margin: 0px;
-    padding: 0px
+    padding: 0px;
+    overflow:  hidden;
+}
+#map-canvas {
+    -webkit-transform: translateZ(0px) rotate(135deg) !important;
+    -moz-transform: translateZ(0px) rotate(135deg) !important;
+    height: 2000px;
+    width: 2000px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -1000px;
+    margin-left: -1000px;
+}
+
+#panel{
+     width:100%;
+     height: 60px;
+     background: #72beff;
+     position: absolute;
+     bottom: 0;
+     display: none;
+ }
+
+#middle-top-pan{
+    margin: 0 auto;
+    width: 700px;
+}
+#middle-pan{
+    margin: 0 auto;
+    width: 115px;
+}
+
+#middle-pan button{
+    width: 35px;
+    height: 30px;
+    background-color: white;
+    background-size: 240px;
+    background-repeat: no-repeat;
+    border: 1px solid rgb(133, 102, 102);
+    border-radius: 3px;
+}
+
+#bt-prev{
+    background: url('../img/buttons.png') 3px 3px;
+}
+#bt-next{
+    background: url('../img/buttons.png') -67px 3px;
+}
+#bt-play{
+    background: url('../img/buttons.png') -30px 3px;
+}
+
+#bt-pause{
+    background: url('../img/buttons.png') -140px 3px;
+}
+
+#bar{
+    margin: 0 auto;
+    width: 585px;
+    display: block;
+    float: left;
+}
+
+#s-cur-time{
+    float: left;
+    width: 50px;
+}
+#s-total-time{
+    width: 50px;
+    float: right;
+}
+
+#info{
+    width:30px;
+    height: 30px;
+    background: #95ff95;
+    display: none;
+}
+
+.button{
+    width: 100px;
+    text-align: center;
+    cursor: pointer;
+    text-decoration: none;
+    color: black;
+    font-weight: normal;
+    font-size: 12pt;
+    border: 1px solid #BBB;
+    padding: 2px 2px 2px 2px;
+    margin-left: 50px;
+    margin-right: 50px;
+    margin-top:10px;
+    border-radius: 4px;
+}
+
+.button:hover {
+    background: #E7E7E7;
+}
+
+#speed {
+    float: left;
+    left: 125px;
+}
+
+#player-panel{
+    background: #fefefe;
+    width: 215px;
+    top: 10px;
+    position: absolute;
+    padding: 5px;
+    display: none;
+}
+#s-title {
+    text-align: center;
+    width: 100%;
+    display: block;
+    font-size: 12pt;
+    font-weight: bold;
+}
+
+#player-table {
+    margin: 8px;
+}
+
+.circle {
+    width:7px;
+    height:7px;
+    border-radius: 15px;
+    float: left;
+    margin-right: 10px;
+    margin-top: 5px;
 }
