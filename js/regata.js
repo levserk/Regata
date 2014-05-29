@@ -203,7 +203,7 @@ function Regata(_race){
             }
         });
         $('#bar').on('input', function(){
-            if (fplaying) pause();
+            //if (fplaying) pause();
             time = parseInt($(this).val());
             animate();
 
