@@ -51,7 +51,7 @@ function loadTrack(tr){
 
 function Regata(_race){
     var tracks;
-    var minLat, maxLat, minLon, maxLon, ts, te, deltaTime, timePerSec=20, time;
+    var minLat, maxLat, minLon, maxLon, ts, te, deltaTime, timePerSec=40, time;
     var playInterval,speedInterval, fplaying;
     init(_race);
 
@@ -79,7 +79,7 @@ function Regata(_race){
 
         mapOptions.center = new google.maps.LatLng(minLat + (maxLat-minLat)*0.5, minLon + (maxLon-minLon)*0.5);
         console.log(tracks);
-        var map = new google.maps.Map(document.getElementById('map-canvas'),  mapOptions);
+        map = new google.maps.Map(document.getElementById('map-canvas'),  mapOptions);
         _.each(race.markers,function(element, index, list){
             var circle = new google.maps.Circle({
                 'center':element,
@@ -132,13 +132,13 @@ function Regata(_race){
         playInterval = setInterval(frame,20);
         fplaying = true;
         console.log(time,te,te-time, deltaTime);
-        $('#bt-play').hide(); $('#bt-pause').show();
+        $('#bt-play').css('background-position','-155px 7px');
     }
 
     function pause(){
         fplaying = false;
         clearInterval(playInterval);
-        $('#bt-play').show(); $('#bt-pause').hide();
+        $('#bt-play').css('background-position','-30px 7px');
     }
 
     function stop(){
@@ -151,7 +151,7 @@ function Regata(_race){
             icon[0].offset = '100%';
             track.line.set('icons',icon);
         });
-        $('#bt-play').show(); $('#bt-pause').hide();
+        $('#bt-play').css('background-position','-30px 7px');
     }
 
     function frame(){
@@ -180,7 +180,7 @@ function Regata(_race){
         var defSpeed;
         $('#bt-prev').mousedown(function(){
             defSpeed = timePerSec;
-            timePerSec = -50;
+            timePerSec = -100;
             $('#s-speed').html('x' + timePerSec);
         }).mouseup(function(){
             timePerSec = defSpeed;
@@ -188,7 +188,7 @@ function Regata(_race){
         });
         $('#bt-next').mousedown(function(){
             defSpeed = timePerSec;
-            timePerSec = 50;
+            timePerSec = 100;
             if (!fplaying) play();
             $('#s-speed').html('x' + timePerSec);
         }).mouseup(function(){
@@ -251,6 +251,15 @@ function Regata(_race){
         $('#player-table').html(phtml);
     }
 
+//    $("#map-canvas").on('mousemove',function(e){
+//        var mx = e.clientX - $("#map-canvas").offset().left, my = e.clientY //- $("#map-canvas").offset().top;
+//        var sin = Math.sin(225*Math.PI/180);
+//        var cos = Math.cos(225*Math.PI/180);
+//        var x = (((mx-1000) * cos) - ((my-1000) * sin))+1000;
+//        var y = (((mx-1000) * sin) + ((my-1000) * cos))+1000;
+//        console.log(mx, my, x , y );
+//    })
+
 }
 
 
@@ -292,7 +301,7 @@ var Track = function(strack){
         if (spoint.length<6) return;
         time = moment(spoint[5]+' '+spoint[6].replace(/\n|\r/g, "")+' +'+strack.timezone,"DD.MM.YYYY HH:mm:ss Z").valueOf();
 
-        if (!time>0 || time-oldTime<minDelta) return;
+        if (!time>0 /*|| time-oldTime<minDelta*/) return;
         if (that.ts==0)that.ts=time;
         oldTime = time;
 
@@ -326,3 +335,78 @@ var Track = function(strack){
         return result;
     }
 };
+
+
+function formatGameTimeMS(timeMS, onlyMinutes) {
+    var onlyMinutes = typeof (onlyMinutes) == "undefined" ? false : onlyMinutes;
+
+    timeMS = iDiv(timeMS, 1000);
+
+    if (timeMS > 3600 * 24)
+        timeMS = 3600 * 24;
+
+    if (timeMS < 0)
+        timeMS = -timeMS;
+
+    if (timeMS == -1)
+        timeMS = 0;
+
+    var sec = timeMS % 60;
+    var min = iDiv(timeMS, 60) % 60;
+    var hrs = iDiv(timeMS, 3600);
+
+    if (!onlyMinutes) {
+        if (hrs == 0) {
+            return min + ":" + ext("" + sec, 2, "0"); // ext("" + min, 2, "0")
+        } else {
+            return hrs + ":" + ext("" + min, 2, "0") + ":" + ext("" + sec, 2, "0"); // ext("" + hrs, 2, "0")
+        }
+    } else {
+        if (min == 0 && hrs == 0)
+            return sec + "&nbsp;" + I18n.contextGet("time", "secondsShortSuffix");
+        else {
+            if (sec > 30)
+                min++;
+            if (min == 60) {
+                hrs++;
+                min = 0;
+            }
+            if (hrs == 0) {
+                return min + "&nbsp;" + I18n.contextGet("time", "minutesShortSuffix");
+            } else {
+                return hrs + "&nbsp;" + I18n.contextGet("time", "hoursSuperShortSuffix")
+                    + "&nbsp;" + min + "&nbsp;" + I18n.contextGet("time", "minutesSuperShortSuffix");
+            }
+        }
+    }
+
+    function iDiv(numerator, denominator) {
+        // In JavaScript, dividing integer values yields a floating point result
+        // (unlike in Java, C++, C)
+        // To find the integer quotient, reduce the numerator by the remainder
+        // first, then divide.
+        var remainder = numerator % denominator;
+        var quotient = (numerator - remainder) / denominator;
+
+        // Another possible solution: Convert quotient to an integer by truncating
+        // toward 0.
+        // Thanks to Frans Janssens for pointing out that the floor function is not
+        // correct for negative quotients.
+        if (quotient >= 0)
+            quotient = Math.floor(quotient);
+        else
+        // negative
+            quotient = Math.ceil(quotient);
+
+        return quotient;
+    }
+
+    function ext(str, len, char) {
+        char = typeof (char) == "undefined" ? "&nbsp;" : char;
+        str = "" + str;
+        while (str.length < len) {
+            str = char + str;
+        }
+        return str;
+    }
+}
