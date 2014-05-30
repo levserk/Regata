@@ -4,7 +4,7 @@ html, body, #map-canvas {
     overflow:  hidden;
 }
 #map-canvas {
-    -webkit-transform: translateZ(0px) rotate(135deg) !important;
+    -webkit-transform: translateZ(0px) rotate(-75deg) !important;
     -moz-transform: translateZ(0px) rotate(135deg) !important;
     height: 2000px;
     width: 2000px;

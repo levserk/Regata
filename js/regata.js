@@ -89,7 +89,7 @@ function Regata(_race) {
                 strokeWeight: 1,
                 'map': map,
                 'radius': 16,
-                'strokeColor': '#0'
+                'strokeColor': '#FFF556'
             });
         });
         var startLine = new google.maps.Polyline({
@@ -110,7 +110,7 @@ function Regata(_race) {
                 ],
                 strokeColor: track.color,
                 strokeOpacity: 1.0,
-                strokeWeight: 0.7,
+                strokeWeight: 0.45,
                 map: map
             });
         });
@@ -266,14 +266,14 @@ function Regata(_race) {
         $('#player-table').html(phtml);
     }
 
-//    $("#map-canvas").on('mousemove',function(e){
-//        var mx = e.clientX - $("#map-canvas").offset().left, my = e.clientY //- $("#map-canvas").offset().top;
-//        var sin = Math.sin(225*Math.PI/180);
-//        var cos = Math.cos(225*Math.PI/180);
-//        var x = (((mx-1000) * cos) - ((my-1000) * sin))+1000;
-//        var y = (((mx-1000) * sin) + ((my-1000) * cos))+1000;
-//        console.log(mx, my, x , y );
-//    })
+    $("#map-canvas").on('mousemove',function(e){
+        var mx = e.clientX - $("#map-canvas").offset().left, my = e.clientY - $("#map-canvas").offset().top;
+        var sin = Math.sin(75*Math.PI/180);
+        var cos = Math.cos(75*Math.PI/180);
+        var x = (((mx-1000) * cos) - ((my-1000) * sin)) + 1000// * cos * 0.5;
+        var y = (((mx-1000) * sin) + ((my-1000) * cos)) + 1000// * sin * 0.5;
+        console.log(mx, my, x , y );
+    });
 
 }
 
