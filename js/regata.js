@@ -337,9 +337,8 @@ var Track = function (strack) {
     });
 
     that.caclDistance = function (time) {
-        if (!(time >= that.ts && time <= that.te)) {
-            if (time > that.te) return that.distance;
-        }
+        if (time >= that.te) return that.distance;
+        if (time <= that.ts) return 0;
         var result = 0;
         _.each(that.points, function (point, index, list) {
             if (result) return;
