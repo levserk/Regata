@@ -17,7 +17,7 @@ html, body, #map-canvas {
 
 #panel{
      width:100%;
-     height: 70px;
+     height: 85px;
      background: #72beff;
      position: absolute;
      bottom: 0;
@@ -85,9 +85,15 @@ html, body, #map-canvas {
     float: left;
 }
 
-#s-cur-time{
+#s-nul-time{
     float: left;
     width: 50px;
+}
+#s-cur-time{
+    display: block;
+    margin: 0 auto;
+    width: 50px;
+    font-size: 15px;
 }
 #s-total-time{
     width: 50px;
