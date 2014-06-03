@@ -27,6 +27,9 @@ var map, mapOptions = {
 };
 var minDelta = 30000;
 var regata;
+var angle = 0, sin = Math.sin(angle*Math.PI/180), cos = Math.cos(angle*Math.PI/180)
+    ,divh = (Math.abs(sin) * $("#map-canvas").height() + Math.abs(cos) * $("#map-canvas").width())*0.5,
+     maph = 700;
 
 $(document).ready(ready);
 
@@ -52,8 +55,13 @@ function loadTrack(tr) {
 function Regata(_race) {
     var tracks;
     var minLat, maxLat, minLon, maxLon, ts, te, deltaTime, timePerSec = 40, time;
-    var playInterval, speedInterval, fplaying=false, frewind=false;
+    var playInterval, speedInterval, fplaying=false, frewind=false, floaded=false, fzoom=false, fdrag=false;
+    var oldCenter, oPos;
     init(_race);
+
+    var overlay = new google.maps.OverlayView();
+    overlay.draw = function() {};
+    overlay.setMap(map);
 
     function init(race) {
         var track;
@@ -128,6 +136,15 @@ function Regata(_race) {
         showPlayers(_race);
 
         time=ts;
+
+        //$('#google-map').hide();
+    }
+
+    function mapLoaded(){
+        floaded = true;
+        if (_race.hasOwnProperty('angle')) rotate(_race.angle);
+        console.log(map.getProjection().fromPointToLatLng(new google.maps.Point(1000, 1000)));
+        console.log(map.getProjection().fromLatLngToPoint(new google.maps.LatLng(20.291, 153.027)));
     }
 
     function play() {
@@ -251,7 +268,19 @@ function Regata(_race) {
         });
         $('#bt-down, #bt-up').mouseup(function () {
             clearInterval(speedInterval);
-        })
+        });
+
+        google.maps.event.addListener( map, 'idle', function() {
+           if (!floaded) mapLoaded();
+           //if (fzoom) centerAfterZoom();
+        });
+    }
+
+    function centerAfterZoom(){
+        var nPos = getLatLng(e.clientX, e.clientY);
+        var dk = oPos.k - nPos.k;
+        var dA = oPos.A - nPos.A;
+        map.setCenter(new google.maps.LatLng(oldCenter.k-dk, oldCenter.A-dA));
     }
 
     function showPlayers(race) {
@@ -266,15 +295,68 @@ function Regata(_race) {
         $('#player-table').html(phtml);
     }
 
-    $("#map-canvas").on('mousemove',function(e){
-        var mx = e.clientX - $("#map-canvas").offset().left, my = e.clientY - $("#map-canvas").offset().top;
-        var sin = Math.sin(75*Math.PI/180);
-        var cos = Math.cos(75*Math.PI/180);
-        var x = (((mx-1000) * cos) - ((my-1000) * sin)) + 1000// * cos * 0.5;
-        var y = (((mx-1000) * sin) + ((my-1000) * cos)) + 1000// * sin * 0.5;
-        console.log(mx, my, x , y );
-    });
+    function rotate(_angle){
+        angle = _angle;
+        var tr = 'rotate(-'+_angle+'deg)';
+        $("#map-canvas").css({
+            '-webkit-transform': tr,
+            '-moz-transform': tr
+        });
+        sin = Math.sin(angle*Math.PI/180);
+        cos = Math.cos(angle*Math.PI/180);
+        divh = (Math.abs(sin) * $("#map-canvas").height() + Math.abs(cos) * $("#map-canvas").width())*0.5;
+    }
 
+    function getLatLng(mx,my){
+        mx -= $("#map-canvas").offset().left;
+        my -= $("#map-canvas").offset().top;
+        //var x = (((mx-divh) * cos) - ((my-divh) * sin)) + maph;
+        //var y = (((mx-divh) * sin) + ((my-divh) * cos)) + maph;
+        return overlay.getProjection().fromContainerPixelToLatLng(new google.maps.Point((((mx-divh) * cos) - ((my-divh) * sin)) + maph, (((mx-divh) * sin) + ((my-divh) * cos)) + maph));
+    }
+
+    $("#map-canvas").on('mousemove',function(e){
+        var nPos = getLatLng(e.clientX, e.clientY);
+        var mx = e.clientX - $("#map-canvas").offset().left;
+        var my = e.clientY - $("#map-canvas").offset().top;
+        var x = (((mx-divh) * cos) - ((my-divh) * sin)) + maph;
+        var y = (((mx-divh) * sin) + ((my-divh) * cos)) + maph;
+        if(fdrag) {
+            console.log(xx,yy,x,y);
+            map.panBy(xx-x, yy-y);
+            xx=x; yy=y;
+        }
+    });
+    $("#map-canvas").on('mouseup',function(e){
+        fdrag=false;
+    });
+    $("#map-canvas").on('mousedown',function(e){
+        fdrag = true;
+        var mx = e.clientX - $("#map-canvas").offset().left;
+        var my = e.clientY - $("#map-canvas").offset().top;
+        xx = (((mx-divh) * cos) - ((my-divh) * sin)) + maph;
+        yy = (((mx-divh) * sin) + ((my-divh) * cos)) + maph;
+    });
+    $("#map-canvas").on('mousewheel DOMMouseScroll',function(e){
+        e.clientX = e.clientX || e.originalEvent.clientX;
+        e.clientY = e.clientY || e.originalEvent.clientY;
+        var delta = e.originalEvent.detail < 0 || e.originalEvent.wheelDelta > 0 ? 1 : -1;
+        var zoom = map.getZoom();
+        var oPot = getLatLng(e.clientX, e.clientY);
+        if (delta>0){
+            map.setZoom(++zoom);
+        }
+        else if (zoom>14){
+            map.setCenter(getLatLng(e.clientX, e.clientY));
+            map.setZoom(--zoom);
+        }
+        var nPot = overlay.getProjection().fromLatLngToContainerPixel(oPot);
+        var mx = e.clientX - $("#map-canvas").offset().left;
+        var my = e.clientY - $("#map-canvas").offset().top;
+        var x = (((mx-divh) * cos) - ((my-divh) * sin)) + maph;
+        var y = (((mx-divh) * sin) + ((my-divh) * cos)) + maph;
+        map.panBy(nPot.x-x, nPot.y-y);
+    });
 }
 
 
@@ -308,14 +390,16 @@ var Track = function (strack) {
     this.timezone = strack.timezone;
     this.color = strack.color;
     this.label = strack.lab;
+    this.delta = 0;
     var that = this;
 
     var spoint, point, prev, time, oldTime = 0, lat, lon;
+    if (strack.hasOwnProperty('delta'))that.delta = strack.delta;
     _.each(strack.spoints, function (element, index, list) {
         spoint = element.split(',');
         if (spoint.length < 6) return;
         time = moment(spoint[5] + ' ' + spoint[6].replace(/\n|\r/g, "") + ' +' + strack.timezone, "DD.MM.YYYY HH:mm:ss Z").valueOf();
-
+        time += that.delta*1000;
         if (!time > 0 /*|| time-oldTime<minDelta*/) return;
         if (that.ts == 0)that.ts = time;
         oldTime = time;
