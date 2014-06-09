@@ -11,20 +11,20 @@ var races = {
                 position: 1
             },
             {
-                url: 'races/8/19.plt',
-                lab: '19',
-                timezone: '02:00',
-                color: '#241EDF',
-                position: 4,
-                delta: 5
-            },
-            {
                 url: 'races/8/17.plt',
                 lab: '17',
                 timezone: '04:00',
                 color: '#FF282C',
                 position: 2,
-                delta: -200
+                delta: -140
+            },
+            {
+                url: 'races/8/19.plt',
+                lab: '19',
+                timezone: '02:00',
+                color: '#241EDF',
+                position: 4,
+                delta: 8
             },
             {
                 url: 'races/8/21.plt',
@@ -53,18 +53,20 @@ var races = {
                 position: 2
             },
             {
-                url: 'races/9/19.plt',
-                lab: '19',
-                timezone: '02:00',
-                color: '#241EDF',
-                position: 6
-            },
-            {
                 url: 'races/9/17.plt',
                 lab: '17',
                 timezone: '04:00',
                 color: '#FF282C' ,
-                position: 4
+                position: 4,
+                delta: -140
+            },
+            {
+                url: 'races/9/19.plt',
+                lab: '19',
+                timezone: '02:00',
+                color: '#241EDF',
+                position: 6,
+                delta: 8
             },
             {
                 url: 'races/9/21.plt',
@@ -97,22 +99,24 @@ var races = {
                 lab: '19',
                 timezone: '02:00',
                 color: '#241EDF' ,
-                position: 4
+                position: 4,
+                delta: 8
             },
             {
                 url: 'races/2014-05-09/3_0200.plt',
                 lab: '21',
                 timezone: '02:00',
                 color: '#FFFFFF' ,
-                position: 4
+                position: 5,
+                delta: 20
             }
         ],
         markers: [
             new google.maps.LatLng(43.496376, 16.363832),
             new google.maps.LatLng(43.497084, 16.363006),
-            new google.maps.LatLng(43.503732, 16.382887),
-            new google.maps.LatLng(43.505771, 16.381331)
+            new google.maps.LatLng(43.503768, 16.382898),
+            new google.maps.LatLng(43.507044, 16.382560)
         ],
-        startLine: [new google.maps.LatLng(43.505771, 16.381331), new google.maps.LatLng(43.503732, 16.382887)]
+        startLine: [new google.maps.LatLng(43.507044, 16.382560), new google.maps.LatLng(43.503768, 16.382898)]
     }
 };

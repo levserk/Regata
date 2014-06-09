@@ -23,7 +23,7 @@ html, body, #map-canvas {
 #panel{
      width:100%;
      height: 85px;
-     background: #72beff;
+     background: #99BBD7;
      position: absolute;
      bottom: 0;
      display: none;
@@ -35,46 +35,41 @@ html, body, #map-canvas {
 }
 #middle-pan{
     margin: 0 auto;
-    width: 200px;
+    width: 305px;
+    position: relative;
+}
+
+#control-panel{
+    margin: 0 auto;
+    width: 114px;
+    height: 40px;
+    display: inline-block;
+    vertical-align: bottom;
 }
 
 .pl-button{
-    background-image: url('../img/buttons.png');
     background-color: white;
-    background-size: 270px;
+    background-size: 50%;
+    background-position: center;
     background-repeat: no-repeat;
-    width: 45px;
-    height: 40px;
-    background-color: white;
-    border: 1px solid rgb(133, 102, 102);
-    border-radius: 3px;
+    width: 32px;
+    height: 32px;
+    border: 2px solid #333333;
+    border-radius: 5px;
+    float: left;
+    margin-left: 1px;
+    margin-right: 1px;
 }
 
 #bt-prev{
-    background-position: 7px 7px;
-    float: left;
+    background-image: url('../img/rewind.png');
 }
 #bt-next{
-    background-position: -70px 7px;
-    float: left;
-}
-#play-pan{
-    float: left;
-    background-color: white;
-    border: 1px solid rgb(133, 102, 102);
-    border-radius: 3px;
-    width: 70px;
+    background-image: url('../img/rewind - right.png');
 }
 
 #bt-play{
-    background-position: -30px 7px;
-    background-image: url('../img/buttons.png');
-    background-color: white;
-    background-size: 270px;
-    background-repeat: no-repeat;
-    width: 45px;
-    height: 40px;
-    margin: 0 auto;
+    background-image: url('../img/play.png');
 }
 
 #bt-pause{
@@ -99,6 +94,7 @@ html, body, #map-canvas {
     margin: 0 auto;
     width: 50px;
     font-size: 15px;
+    text-align: center;
 }
 #s-total-time{
     width: 50px;
@@ -133,34 +129,58 @@ html, body, #map-canvas {
 }
 
 #speed {
-    font-size: 8pt;
-    margin-top: -18px;
-    position: relative;
+    font-size: 11pt;
     text-align: center;
-    height: 15px;
+    height: 31px;
+    width: 81px;
+    display: inline-block;
+    vertical-align: bottom;
+    margin-right: 5px;
+}
+#angle {
+    font-size: 8pt;
+    text-align: center;
+    height: 31px;
+    width: 88px;
+    display: inline-block;
+    vertical-align: bottom;
+    margin-left: 5px;
 }
 
 .bt-speed {
-    width: 14px;
-    height: 15px;
-    padding: 0px;
-    margin: 0px;
-    border-radius: 0px;
-    border: 1px solid rgb(133, 102, 102);
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    border: 2px solid #333333;
+    border-radius: 5px;
     background: white;
-    border-bottom: none;
-    margin-top: 3px;
+    vertical-align: top;
 }
 
 #bt-down{
-    left: 0px;
-    border-left: none;
+    left: 0;
     float: left;
 }
 
+#bt-left{
+    left: 0;
+    float: left;
+    background-image: url('../img/left - arrow.png');
+    background-size: 80%;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
 #bt-up{
-    right: 0px;
-    border-right: none;
+    right: 0;
+}
+
+#bt-right{
+    right: 0;
+    background-image: url('../img/right - arrow.png');
+    background-size: 80%;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
 

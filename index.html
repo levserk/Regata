@@ -26,7 +26,7 @@
     <div id="map-canvas"></div>
 </div>
 
-<div style="width: 1200px; margin: 0 auto">
+<div style="width: 900px; margin: 0 auto">
     <div id ="player-panel">
         <span id="s-title">
             Title
@@ -39,25 +39,31 @@
  <div id="panel">
              <div style="width:1200px; margin: 0 auto">
                  <div id="middle-top-pan">
-                     <span id="s-nul-time">-05:00</span>
+                     <span id="s-nul-time">-01:00</span>
                      <input id="bar" type="range" min="0" max="100000" value="0" />
                      <span id="s-total-time">&nbsp;</span>
                      <span id="s-cur-time">&nbsp;</span>
                  </div>
                  <div id="middle-pan">
-                     <div class="pl-button" id="bt-prev"></div>
-                     <div id="play-pan">
-                         <div id="bt-play"></div>
-                         <div id="speed">
-                               <button class="bt-speed" id="bt-down">-</button>
+                     <div id="speed">
+                         <button class="bt-speed" id="bt-down">-</button>
                                <span id="s-speed" style = " display: block;
                                                             float: left;
-                                                            width: 41px;
-                                                            margin-top: 3px;">x50</span>
-                               <button class="bt-speed" id="bt-up">+</button>
-                         </div>
+                                                            width: 41px; margin-top: 2px">x50</span>
+                         <button class="bt-speed" id="bt-up">+</button>
                      </div>
-                     <div class="pl-button" id="bt-next"></div>
+                     <div id="control-panel">
+                        <div class="pl-button" id="bt-prev"></div>
+                        <div class="pl-button" id="bt-play"></div>
+                        <div class="pl-button" id="bt-next"></div>
+                     </div>
+                     <div id="angle">
+                         <button class="bt-speed" id="bt-left"></button>
+                               <span id="s-angle" style = " display: block;
+                                                            float: left;
+                                                            width: 47px; margin-top: 2px">-1° &nbsp; &nbsp; +1°</span>
+                         <button class="bt-speed" id="bt-right"></button>
+                     </div>
                  </div>
                  <div id="info"></div>
              </div>

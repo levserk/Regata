@@ -43,7 +43,7 @@ function loadTrack(tr) {
     var race = races[tr];
 
     _.each(race.stracks, function (element, index, list) {
-        $.ajax({url: element.url, async: false}).done(function (strack) {
+        $.ajax({url: element.url, async: false, cache: false}).done(function (strack) {
             element.spoints = strack.split('\n').slice(6);
         });
     });
@@ -55,7 +55,7 @@ function loadTrack(tr) {
 function Regata(_race) {
     var tracks;
     var minLat, maxLat, minLon, maxLon, ts, te, deltaTime, timePerSec = 40, time;
-    var playInterval, speedInterval, fplaying=false, frewind=false, floaded=false, fzoom=false, fdrag=false;
+    var playInterval, speedInterval, rotateInterval, fplaying=false, frewind=false, floaded=false, fzoom=false, fdrag=false;
     var oldCenter, oPos;
     init(_race);
 
@@ -96,7 +96,8 @@ function Regata(_race) {
                 fillOpacity: 1,
                 strokeWeight: 1,
                 'map': map,
-                'radius': 16,
+                scale: 10,
+                'radius': 10,
                 'strokeColor': '#FFF556'
             });
         });
@@ -153,13 +154,13 @@ function Regata(_race) {
         playInterval = setInterval(frame, 20);
         fplaying = true;
         console.log(time, te, te - time, deltaTime);
-        $('#bt-play').css('background-position', '-155px 7px');
+        $('#bt-play').css('background-color', '#FFF6AC');
     }
 
     function pause() {
         fplaying = false;
         clearInterval(playInterval);
-        $('#bt-play').css('background-position', '-30px 7px');
+        $('#bt-play').css('background-color', 'white');
     }
 
     function stop() {
@@ -172,7 +173,7 @@ function Regata(_race) {
             icon[0].offset = '100%';
             track.line.set('icons', icon);
         });
-        $('#bt-play').css('background-position', '-30px 7px');
+        $('#bt-play').css('background-color', 'white');
     }
 
     function frame() {
@@ -240,11 +241,12 @@ function Regata(_race) {
             animate();
 
         });
+
+
         $('#bt-down').click(function () {
             //if (timePerSec > 0)timePerSec--;
             $('#s-speed').html('x' + timePerSec);
         });
-
         $('#bt-up').click(function () {
             //if (timePerSec < 300)timePerSec++;
             $('#s-speed').html('x' + timePerSec);
@@ -257,7 +259,6 @@ function Regata(_race) {
                 $('#s-speed').html('x' + timePerSec);
             }, 50);
         });
-
         $('#bt-up').mousedown(function () {
             clearInterval(speedInterval);
             speedInterval = setInterval(function () {
@@ -266,7 +267,22 @@ function Regata(_race) {
                 $('#s-speed').html('x' + timePerSec);
             }, 50);
         });
-        $('#bt-down, #bt-up').mouseup(function () {
+
+        $('#bt-left').mousedown(function () {
+            clearInterval(rotateInterval);
+            rotateInterval = setInterval(function () {
+                rotate(--angle);
+            }, 50);
+        });
+        $('#bt-right').mousedown(function () {
+            clearInterval(rotateInterval);
+            rotateInterval = setInterval(function () {
+                rotate(++angle);
+            }, 50);
+        });
+
+        $(document).on('mouseup',function(){
+            clearInterval(rotateInterval);
             clearInterval(speedInterval);
         });
 
@@ -297,6 +313,8 @@ function Regata(_race) {
 
     function rotate(_angle){
         angle = _angle;
+        if (angle>360)angle=0;
+        if (angle<0)angle=360;
         var tr = 'rotate(-'+_angle+'deg)';
         $("#map-canvas").css({
             '-webkit-transform': tr,
@@ -305,6 +323,8 @@ function Regata(_race) {
         sin = Math.sin(angle*Math.PI/180);
         cos = Math.cos(angle*Math.PI/180);
         divh = (Math.abs(sin) * $("#map-canvas").height() + Math.abs(cos) * $("#map-canvas").width())*0.5;
+        //$('#s-angle').html(angle+'°');
+        console.log(angle)
     }
 
     function getLatLng(mx,my){
@@ -327,9 +347,9 @@ function Regata(_race) {
             xx=x; yy=y;
         }
     });
-    $("#map-canvas").on('mouseup',function(e){
+    $(window).on('mouseup',function(e){
         fdrag=false;
-    });
+    }).on('mouseout',function(){fdrag=false});
     $("#map-canvas").on('mousedown',function(e){
         fdrag = true;
         var mx = e.clientX - $("#map-canvas").offset().left;
