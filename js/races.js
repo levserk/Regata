@@ -58,7 +58,7 @@ var races = {
                 timezone: '04:00',
                 color: '#FF282C' ,
                 position: 4,
-                delta: -140
+                delta: -145
             },
             {
                 url: 'races/9/19.plt',
@@ -109,6 +109,93 @@ var races = {
                 color: '#FFFFFF' ,
                 position: 5,
                 delta: 20
+            }
+        ],
+        markers: [
+            new google.maps.LatLng(43.496376, 16.363832),
+            new google.maps.LatLng(43.497084, 16.363006),
+            new google.maps.LatLng(43.503768, 16.382898),
+            new google.maps.LatLng(43.507044, 16.382560)
+        ],
+        startLine: [new google.maps.LatLng(43.507044, 16.382560), new google.maps.LatLng(43.503768, 16.382898)]
+    },
+    '11': {
+        title:'Тиурула 1<br> 13 июня 2014 года',
+        angle:0,
+        stracks: [
+            {
+                url: 'races/2014-06-13/GII1.plt',
+                lab: 'ONE',
+                timezone: '04:00',
+                color: '#20A530' ,
+                position: 0,
+                delta: 0
+            },
+            {
+                url: 'races/2014-06-13/SVIRIDA1.plt',
+                lab: 'TWO',
+                timezone: '04:00',
+                color: '#241EDF' ,
+                position: 0,
+                delta: 0
+            }
+        ],
+        markers: [
+            new google.maps.LatLng(43.496376, 16.363832),
+            new google.maps.LatLng(43.497084, 16.363006),
+            new google.maps.LatLng(43.503768, 16.382898),
+            new google.maps.LatLng(43.507044, 16.382560)
+        ],
+        startLine: [new google.maps.LatLng(43.507044, 16.382560), new google.maps.LatLng(43.503768, 16.382898)]
+    },
+    '12': {
+        title:'Тиурула 2<br> 13 июня 2014 года',
+        angle:0,
+        stracks: [
+            {
+                url: 'races/2014-06-13/GII2.plt',
+                lab: 'ONE',
+                timezone: '04:00',
+                color: '#20A530' ,
+                position: 0,
+                delta: 0
+            },
+            {
+                url: 'races/2014-06-13/SVIRIDA2.plt',
+                lab: 'TWO',
+                timezone: '04:00',
+                color: '#241EDF' ,
+                position: 0,
+                delta: 0
+            }
+        ],
+        markers: [
+            new google.maps.LatLng(43.496376, 16.363832),
+            new google.maps.LatLng(43.497084, 16.363006),
+            new google.maps.LatLng(43.503768, 16.382898),
+            new google.maps.LatLng(43.507044, 16.382560)
+        ],
+        startLine: [new google.maps.LatLng(43.507044, 16.382560), new google.maps.LatLng(43.503768, 16.382898)]
+    },
+    '13': {
+        title:'Тиурула 2 My Tracks <br> 13 июня 2014 года',
+        angle:0,
+        stracks: [
+            {
+                url: 'races/2014-06-13/GII_GPX2.plt',
+                lab: 'ONE',
+                timezone: '04:00',
+                color: '#20A530' ,
+                position: 0,
+                delta: 0
+            },
+            {
+                url: 'races/2014-06-13/SVIRIDA_GPX2.plt',
+                lab: 'TWO',
+                timezone: '04:00',
+                color: '#241EDF' ,
+                position: 0,
+                delta: 0
             }
         ],
         markers: [
