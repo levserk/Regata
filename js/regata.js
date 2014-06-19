@@ -358,24 +358,17 @@ function Regata(_race) {
         yy = (((mx-divh) * sin) + ((my-divh) * cos)) + maph;
     });
     $("#map-canvas").on('mousewheel DOMMouseScroll',function(e){
-        e.clientX = e.clientX || e.originalEvent.clientX;
-        e.clientY = e.clientY || e.originalEvent.clientY;
         var delta = e.originalEvent.detail < 0 || e.originalEvent.wheelDelta > 0 ? 1 : -1;
         var zoom = map.getZoom();
-        var oPot = getLatLng(e.clientX, e.clientY);
+        var oPot = getLatLng(maph, maph);
         if (delta>0){
             map.setZoom(++zoom);
         }
         else if (zoom>14){
-            map.setCenter(getLatLng(e.clientX, e.clientY));
             map.setZoom(--zoom);
         }
         var nPot = overlay.getProjection().fromLatLngToContainerPixel(oPot);
-        var mx = e.clientX - $("#map-canvas").offset().left;
-        var my = e.clientY - $("#map-canvas").offset().top;
-        var x = (((mx-divh) * cos) - ((my-divh) * sin)) + maph;
-        var y = (((mx-divh) * sin) + ((my-divh) * cos)) + maph;
-        map.panBy(nPot.x-x, nPot.y-y);
+        map.panBy(nPot.x-maph, nPot.y-maph);
     });
 }
 
