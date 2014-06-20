@@ -1,7 +1,7 @@
 var races = {
     '8': {
         title:'Гонка 8 (4 день, 1 гонка, 2 круга) <br> 8 мая (Хорватия)',
-        angle:228,
+        angle:200,
         stracks: [
             {
                 url: 'races/8/23.plt',

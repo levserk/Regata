@@ -25,7 +25,7 @@ var map, mapOptions = {
         }
     ]
 };
-var minDelta = 30000;
+var minDelta = 10000;
 var regata;
 var angle = 0, sin = Math.sin(angle*Math.PI/180), cos = Math.cos(angle*Math.PI/180)
     ,divh = (Math.abs(sin) * $("#map-canvas").height() + Math.abs(cos) * $("#map-canvas").width())*0.5,
@@ -56,6 +56,7 @@ function Regata(_race) {
     var tracks;
     var minLat, maxLat, minLon, maxLon, ts, te, deltaTime, timePerSec = 40, time;
     var playInterval, speedInterval, rotateInterval, fplaying=false, frewind=false, floaded=false, fzoom=false, fdrag=false;
+    var ffollow = false
     var oldCenter, oPos;
     init(_race);
 
@@ -198,6 +199,21 @@ function Regata(_race) {
             track.line.set('icons', icon);
         });
         $('#s-cur-time').html(formatGameTimeMS(time - ts));
+        if (ffollow)moveToPoints();
+    }
+
+    function moveToPoints(){
+        var points = [], point;
+        _.each(tracks, function (track, index, list) {
+            point = track.getLatLon(time);
+            if (point) points.push(point);
+        });
+        if (points.length==0) return;
+        var center = getCenter(points);
+        //if (getDistance(map.getCenter(), center) > 1){
+            map.panTo(center);
+        //}
+
     }
 
     function bindEvents() {
@@ -290,6 +306,12 @@ function Regata(_race) {
            if (!floaded) mapLoaded();
            //if (fzoom) centerAfterZoom();
         });
+
+        $('#bt-follow').click(function(){
+            ffollow = !ffollow;
+            if (ffollow) $(this).css('background-color', '#FFF6AC');
+            else $(this).css('background-color', 'white');
+        });
     }
 
     function centerAfterZoom(){
@@ -342,7 +364,6 @@ function Regata(_race) {
         var x = (((mx-divh) * cos) - ((my-divh) * sin)) + maph;
         var y = (((mx-divh) * sin) + ((my-divh) * cos)) + maph;
         if(fdrag) {
-            console.log(xx,yy,x,y);
             map.panBy(xx-x, yy-y);
             xx=x; yy=y;
         }
@@ -364,11 +385,16 @@ function Regata(_race) {
         if (delta>0){
             map.setZoom(++zoom);
         }
-        else if (zoom>14){
-            map.setZoom(--zoom);
+        else {
+            if (zoom>14){
+                map.setZoom(--zoom);
+            } else return;
         }
-        var nPot = overlay.getProjection().fromLatLngToContainerPixel(oPot);
-        map.panBy(nPot.x-maph, nPot.y-maph);
+       // if (ffollow) return;
+        //map.setCenter(getLatLng(maph, maph));
+        //var nPot = overlay.getProjection().fromLatLngToContainerPixel(oPot);
+        //var center = getLatLng(maph, maph);
+        //map.panBy(nPot.x-maph, nPot.y-maph);
     });
 }
 
@@ -413,7 +439,7 @@ var Track = function (strack) {
         if (spoint.length < 6) return;
         time = moment(spoint[5] + ' ' + spoint[6].replace(/\n|\r/g, "") + ' +' + strack.timezone, "DD.MM.YYYY HH:mm:ss Z").valueOf();
         time += that.delta*1000;
-        if (!time > 0 /*|| time-oldTime<minDelta*/) return;
+        if (!time > 0 || time-oldTime<minDelta) return;
         if (that.ts == 0)that.ts = time;
         oldTime = time;
 
@@ -433,7 +459,7 @@ var Track = function (strack) {
         that.te = time;
     });
 
-    that.caclDistance = function (time) {
+    this.caclDistance = function (time) {
         if (time >= that.te) return that.distance;
         if (time <= that.ts) return 0;
         var result = 0;
@@ -447,7 +473,55 @@ var Track = function (strack) {
             }
         });
         return result;
-    }
+    };
+
+    this.getLatLon = function(time){
+        if (time >= that.te) return that.points[that.points.length-1].latLng;
+        if (time <= that.ts) return 0;
+        var result = 0;
+        _.each(that.points, function (point, index, list) {
+            if (result) return;
+            if (index == list.length - 1) {
+                result = point.latLng;
+            } else
+            if (time >= point.time && list[index + 1].time > time) {
+                var nextPoint = list[index + 1];
+                var per = (time - point.time) / (nextPoint.time - point.time);
+                var lat = point.lat + (nextPoint.lat - point.lat) * per;
+                var lon = point.lon + (nextPoint.lon - point.lon) * per;
+                result = new google.maps.LatLng(lat, lon);
+            }
+        });
+        return result;
+    };
+
+};
+
+function getCenter(points){
+    var minLat = null, maxLat = null, minLon = null, maxLon = null;
+    _.each(points, function (point, index, list) {
+        if (maxLat == null || maxLat < point.k) maxLat = point.k;
+        if (maxLon == null || maxLon < point.A) maxLon = point.A;
+        if (minLat == null || minLat > point.k) minLat = point.k;
+        if (minLon == null || minLon > point.A) minLon = point.A;
+    });
+    return new google.maps.LatLng(minLat + (maxLat - minLat)*0.5, minLon + (maxLon - minLon)*0.5);
+}
+
+var getDistance = function(p1, p2) {
+    var R = 6378137; // Earth’s mean radius in meter
+    var dLat = rad(p2.lat() - p1.lat());
+    var dLong = rad(p2.lng() - p1.lng());
+    var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(rad(p1.lat())) * Math.cos(rad(p2.lat())) *
+            Math.sin(dLong / 2) * Math.sin(dLong / 2);
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    var d = R * c;
+    return d; // returns the distance in meter
+};
+
+var rad = function(x) {
+    return x * Math.PI / 180;
 };
 
 
