@@ -56,7 +56,7 @@ function Regata(_race) {
     var tracks;
     var minLat, maxLat, minLon, maxLon, ts, te, deltaTime, timePerSec = 40, time;
     var playInterval, speedInterval, rotateInterval, fplaying=false, frewind=false, floaded=false, fzoom=false, fdrag=false;
-    var ffollow = false
+    var ffollow = false;
     var oldCenter, oPos;
     init(_race);
 
@@ -87,7 +87,6 @@ function Regata(_race) {
         });
 
         mapOptions.center = new google.maps.LatLng(minLat + (maxLat - minLat) * 0.5, minLon + (maxLon - minLon) * 0.5);
-        console.log(tracks);
         map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
         _.each(race.markers, function (element, index, list) {
             var circle = new google.maps.Circle({
@@ -145,8 +144,6 @@ function Regata(_race) {
     function mapLoaded(){
         floaded = true;
         if (_race.hasOwnProperty('angle')) rotate(_race.angle);
-        console.log(map.getProjection().fromPointToLatLng(new google.maps.Point(1000, 1000)));
-        console.log(map.getProjection().fromLatLngToPoint(new google.maps.LatLng(20.291, 153.027)));
     }
 
     function play() {
@@ -154,7 +151,6 @@ function Regata(_race) {
         deltaTime = new Date();
         playInterval = setInterval(frame, 20);
         fplaying = true;
-        console.log(time, te, te - time, deltaTime);
         $('#bt-play').css('background-color', '#FFF6AC');
     }
 
@@ -190,12 +186,14 @@ function Regata(_race) {
             time = te;
             return false;
         }
+        return true;
     }
 
     function animate() {
         _.each(tracks, function (track, index, list) {
             icon = track.line.get('icons');
-            icon[0].offset = track.caclDistance(time) / track.distance * 100 + '%';
+            var distance =  track.caclDistance(time);
+            icon[0].offset = distance / track.distance * 100 + '%';
             track.line.set('icons', icon);
         });
         $('#s-cur-time').html(formatGameTimeMS(time - ts));
@@ -346,7 +344,6 @@ function Regata(_race) {
         cos = Math.cos(angle*Math.PI/180);
         divh = (Math.abs(sin) * $("#map-canvas").height() + Math.abs(cos) * $("#map-canvas").width())*0.5;
         //$('#s-angle').html(angle+'°');
-        console.log(angle)
     }
 
     function getLatLng(mx,my){
@@ -410,7 +407,14 @@ var Point = function (_t, _lat, _lon) {
     this.totalDistance = 0;
     this.calcDistance = function (point) {
         if (!point) return;
-        that.distance = Math.sqrt(Math.pow(that.lat - point.lat, 2) + Math.pow(that.lon - point.lon, 2));
+        var R = 6378137; // Earth’s mean radius in meter
+        var dLat = rad(point.lat - that.lat);
+        var dLong = rad(point.lon- that.lon);
+        var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(rad(that.lat)) * Math.cos(rad(point.lat)) *
+                Math.sin(dLong / 2) * Math.sin(dLong / 2);
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        that.distance = R * c;
         that.totalDistance = point.totalDistance + that.distance;
     };
     var that = this;
@@ -439,7 +443,7 @@ var Track = function (strack) {
         if (spoint.length < 6) return;
         time = moment(spoint[5] + ' ' + spoint[6].replace(/\n|\r/g, "") + ' +' + strack.timezone, "DD.MM.YYYY HH:mm:ss Z").valueOf();
         time += that.delta*1000;
-        if (!time > 0 || time-oldTime<minDelta) return;
+        if (!time > 0 /*|| time-oldTime<minDelta*/) return;
         if (that.ts == 0)that.ts = time;
         oldTime = time;
 
@@ -508,7 +512,7 @@ function getCenter(points){
     return new google.maps.LatLng(minLat + (maxLat - minLat)*0.5, minLon + (maxLon - minLon)*0.5);
 }
 
-var getDistance = function(p1, p2) {
+var getDistance = function(p1, p2) { // in meters from points
     var R = 6378137; // Earth’s mean radius in meter
     var dLat = rad(p2.lat() - p1.lat());
     var dLong = rad(p2.lng() - p1.lng());

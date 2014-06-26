@@ -1,7 +1,7 @@
 var races = {
     '8': {
         title:'Гонка 8 (4 день, 1 гонка, 2 круга) <br> 8 мая (Хорватия)',
-        angle:200,
+        angle:228,
         stracks: [
             {
                 url: 'races/8/23.plt',
@@ -48,14 +48,14 @@ var races = {
             {
                 url: 'races/9/23.plt',
                 lab: '23',
-                timezone: '04:00',
+                timezone: '0400',
                 color: '#20A530',
                 position: 2
             },
             {
                 url: 'races/9/17.plt',
                 lab: '17',
-                timezone: '04:00',
+                timezone: '0400',
                 color: '#FF282C' ,
                 position: 4,
                 delta: -145
@@ -63,7 +63,7 @@ var races = {
             {
                 url: 'races/9/19.plt',
                 lab: '19',
-                timezone: '02:00',
+                timezone: '0200',
                 color: '#241EDF',
                 position: 6,
                 delta: 8
@@ -71,7 +71,7 @@ var races = {
             {
                 url: 'races/9/21.plt',
                 lab: '21',
-                timezone: '02:00',
+                timezone: '0200',
                 color: '#FFFFFF',
                 position: 0
             }
@@ -90,14 +90,14 @@ var races = {
             {
                 url: 'races/2014-05-09/1_0400.plt',
                 lab: '23',
-                timezone: '04:00',
+                timezone: '0400',
                 color: '#20A530' ,
                 position: 2
             },
             {
                 url: 'races/2014-05-09/2_0200.plt',
                 lab: '19',
-                timezone: '02:00',
+                timezone: '0200',
                 color: '#241EDF' ,
                 position: 4,
                 delta: 8
@@ -105,7 +105,7 @@ var races = {
             {
                 url: 'races/2014-05-09/3_0200.plt',
                 lab: '21',
-                timezone: '02:00',
+                timezone: '0200',
                 color: '#FFFFFF' ,
                 position: 5,
                 delta: 20
@@ -126,7 +126,7 @@ var races = {
             {
                 url: 'races/2014-06-13/GII1.plt',
                 lab: 'ONE',
-                timezone: '04:00',
+                timezone: '0400',
                 color: '#20A530' ,
                 position: 0,
                 delta: 0
@@ -134,7 +134,7 @@ var races = {
             {
                 url: 'races/2014-06-13/SVIRIDA1.plt',
                 lab: 'TWO',
-                timezone: '04:00',
+                timezone: '0400',
                 color: '#241EDF' ,
                 position: 0,
                 delta: 0
@@ -155,7 +155,7 @@ var races = {
             {
                 url: 'races/2014-06-13/GII2.plt',
                 lab: 'ONE',
-                timezone: '04:00',
+                timezone: '0400',
                 color: '#20A530' ,
                 position: 0,
                 delta: 0
@@ -163,7 +163,7 @@ var races = {
             {
                 url: 'races/2014-06-13/SVIRIDA2.plt',
                 lab: 'TWO',
-                timezone: '04:00',
+                timezone: '0400',
                 color: '#241EDF' ,
                 position: 0,
                 delta: 0
@@ -184,7 +184,7 @@ var races = {
             {
                 url: 'races/2014-06-13/GII_GPX2.plt',
                 lab: 'ONE',
-                timezone: '04:00',
+                timezone: '0400',
                 color: '#20A530' ,
                 position: 0,
                 delta: 0
@@ -192,7 +192,7 @@ var races = {
             {
                 url: 'races/2014-06-13/SVIRIDA_GPX2.plt',
                 lab: 'TWO',
-                timezone: '04:00',
+                timezone: '0400',
                 color: '#241EDF' ,
                 position: 0,
                 delta: 0
@@ -205,5 +205,47 @@ var races = {
             new google.maps.LatLng(43.507044, 16.382560)
         ],
         startLine: [new google.maps.LatLng(43.507044, 16.382560), new google.maps.LatLng(43.503768, 16.382898)]
+    },
+    '14': {
+        title:'Проверка NAVGPS <br> 20 июня 2014 года',
+        angle:0,
+        stracks: [
+            {
+                url: 'races/2014-06-20/navgps_.plt',
+                lab: 'NAV',
+                timezone: '0400',
+                color: '#FF282C',
+                position: 0,
+                delta: 0
+            }
+        ],
+        markers: [
+            new google.maps.LatLng(43.496376, 16.363832),
+            new google.maps.LatLng(43.497084, 16.363006),
+            new google.maps.LatLng(43.503768, 16.382898),
+            new google.maps.LatLng(43.507044, 16.382560)
+        ],
+        startLine: [new google.maps.LatLng(43.507044, 16.382560), new google.maps.LatLng(43.503768, 16.382898)]
+    },
+    '15': {
+        title:'Проверка NAVGPS <br> 24 июня 2014 года',
+        angle:0,
+        stracks: [
+            {
+                url: 'races/2014-06-24/T_2014-06-24_22_46_28.dat',
+                lab: 'NAV',
+                timezone: '0400',
+                color: '#FF282C',
+                position: 0,
+                delta: 0
+            }
+        ],
+        markers: [
+            new google.maps.LatLng(0.0, 0.0),
+            new google.maps.LatLng(0.0, 0.0),
+            new google.maps.LatLng(0.0, 0.0),
+            new google.maps.LatLng(0.0, 0.0)
+        ],
+        startLine: [new google.maps.LatLng(59.933353, 30.36018), new google.maps.LatLng(60.035202, 30.331718)]
     }
 };
