@@ -4,14 +4,14 @@ var races = {
         angle:228,
         stracks: [
             {
-                url: 'races/8/23.plt',
+                url: 'races/8/23.dat',
                 lab: '23',
                 timezone: '04:00',
                 color: '#20A530',
                 position: 1
             },
             {
-                url: 'races/8/17.plt',
+                url: 'races/8/17.dat',
                 lab: '17',
                 timezone: '04:00',
                 color: '#FF282C',
@@ -19,7 +19,7 @@ var races = {
                 delta: -140
             },
             {
-                url: 'races/8/19.plt',
+                url: 'races/8/19.dat',
                 lab: '19',
                 timezone: '02:00',
                 color: '#241EDF',
@@ -27,7 +27,7 @@ var races = {
                 delta: 8
             },
             {
-                url: 'races/8/21.plt',
+                url: 'races/8/21.dat',
                 lab: '21',
                 timezone: '02:00',
                 color: '#FFFFFF',
@@ -46,14 +46,14 @@ var races = {
         angle:228,
         stracks: [
             {
-                url: 'races/9/23.plt',
+                url: 'races/9/23.dat',
                 lab: '23',
                 timezone: '0400',
                 color: '#20A530',
                 position: 2
             },
             {
-                url: 'races/9/17.plt',
+                url: 'races/9/17.dat',
                 lab: '17',
                 timezone: '0400',
                 color: '#FF282C' ,
@@ -61,7 +61,7 @@ var races = {
                 delta: -145
             },
             {
-                url: 'races/9/19.plt',
+                url: 'races/9/19.dat',
                 lab: '19',
                 timezone: '0200',
                 color: '#241EDF',
@@ -69,7 +69,7 @@ var races = {
                 delta: 8
             },
             {
-                url: 'races/9/21.plt',
+                url: 'races/9/21.dat',
                 lab: '21',
                 timezone: '0200',
                 color: '#FFFFFF',
@@ -88,14 +88,14 @@ var races = {
         angle:242,
         stracks: [
             {
-                url: 'races/2014-05-09/1_0400.plt',
+                url: 'races/2014-05-09/1_0400.dat',
                 lab: '23',
                 timezone: '0400',
                 color: '#20A530' ,
                 position: 2
             },
             {
-                url: 'races/2014-05-09/2_0200.plt',
+                url: 'races/2014-05-09/2_0200.dat',
                 lab: '19',
                 timezone: '0200',
                 color: '#241EDF' ,
@@ -103,7 +103,7 @@ var races = {
                 delta: 8
             },
             {
-                url: 'races/2014-05-09/3_0200.plt',
+                url: 'races/2014-05-09/3_0200.dat',
                 lab: '21',
                 timezone: '0200',
                 color: '#FFFFFF' ,
@@ -124,7 +124,7 @@ var races = {
         angle:0,
         stracks: [
             {
-                url: 'races/2014-06-13/GII1.plt',
+                url: 'races/2014-06-13/GII1.dat',
                 lab: 'ONE',
                 timezone: '0400',
                 color: '#20A530' ,
@@ -132,7 +132,7 @@ var races = {
                 delta: 0
             },
             {
-                url: 'races/2014-06-13/SVIRIDA1.plt',
+                url: 'races/2014-06-13/SVIRIDA1.dat',
                 lab: 'TWO',
                 timezone: '0400',
                 color: '#241EDF' ,
@@ -153,7 +153,7 @@ var races = {
         angle:0,
         stracks: [
             {
-                url: 'races/2014-06-13/GII2.plt',
+                url: 'races/2014-06-13/GII2.dat',
                 lab: 'ONE',
                 timezone: '0400',
                 color: '#20A530' ,
@@ -161,7 +161,7 @@ var races = {
                 delta: 0
             },
             {
-                url: 'races/2014-06-13/SVIRIDA2.plt',
+                url: 'races/2014-06-13/SVIRIDA2.dat',
                 lab: 'TWO',
                 timezone: '0400',
                 color: '#241EDF' ,
@@ -182,7 +182,7 @@ var races = {
         angle:0,
         stracks: [
             {
-                url: 'races/2014-06-13/GII_GPX2.plt',
+                url: 'races/2014-06-13/GII_GPX2.dat',
                 lab: 'ONE',
                 timezone: '0400',
                 color: '#20A530' ,
@@ -190,7 +190,7 @@ var races = {
                 delta: 0
             },
             {
-                url: 'races/2014-06-13/SVIRIDA_GPX2.plt',
+                url: 'races/2014-06-13/SVIRIDA_GPX2.dat',
                 lab: 'TWO',
                 timezone: '0400',
                 color: '#241EDF' ,
@@ -211,7 +211,7 @@ var races = {
         angle:0,
         stracks: [
             {
-                url: 'races/2014-06-20/navgps_.plt',
+                url: 'races/2014-06-20/navgps_.dat',
                 lab: 'NAV',
                 timezone: '0400',
                 color: '#FF282C',

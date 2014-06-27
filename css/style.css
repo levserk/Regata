@@ -186,9 +186,10 @@ html, body, #map-canvas {
 
 #player-panel{
     background: #bfbfbf;
-    width: 245px;
+    width: 220px;
     top: 10px;
     position: absolute;
+    margin-left: -188px;
     padding: 5px;
     display: none;
 }

@@ -56,8 +56,9 @@ function Regata(_race) {
     var tracks;
     var minLat, maxLat, minLon, maxLon, ts, te, deltaTime, timePerSec = 40, time;
     var playInterval, speedInterval, rotateInterval, fplaying=false, frewind=false, floaded=false, fzoom=false, fdrag=false;
-    var ffollow = false;
+    var ffollow = false, fidle=false;
     var oldCenter, oPos;
+    var refereePoint, startPoint, markers;
     init(_race);
 
     var overlay = new google.maps.OverlayView();
@@ -70,13 +71,6 @@ function Regata(_race) {
 
         _.each(race.stracks, function (element, index, list) {
             track = new Track(element);
-            track.marker = {
-                path: google.maps.SymbolPath.CIRCLE,
-                scale: 3,
-                fillOpacity: 1,
-                fillColor: track.color,
-                strokeColor: track.color
-            };
             tracks.push(track);
             if (maxLat == null || maxLat < track.maxLat) maxLat = track.maxLat;
             if (maxLon == null || maxLon < track.maxLon) maxLon = track.maxLon;
@@ -84,11 +78,17 @@ function Regata(_race) {
             if (minLon == null || minLon > track.minLon) minLon = track.minLon;
             if (ts == null || ts > track.ts) ts = track.ts;
             if (te == null || te < track.te) te = track.te;
+            if (track.refereePoint) refereePoint = track.refereePoint;
+            if (track.startPoint) startPoint = track.startPoint;
+            if (track.markers.length>0) markers = track.markers;
         });
 
         mapOptions.center = new google.maps.LatLng(minLat + (maxLat - minLat) * 0.5, minLon + (maxLon - minLon) * 0.5);
         map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
-        _.each(race.markers, function (element, index, list) {
+        if (race.markers) markers = race.markers;
+
+        // draw markers
+        _.each(markers, function (element, index, list) {
             var circle = new google.maps.Circle({
                 'center': element,
                 'clickable': false,
@@ -101,13 +101,18 @@ function Regata(_race) {
                 'strokeColor': '#FFF556'
             });
         });
-        var startLine = new google.maps.Polyline({
-            path: race.startLine,
-            strokeColor: "#FFF556",
-            strokeOpacity: 1.0,
-            strokeWeight: 2,
-            map: map
-        });
+
+        // draw start line
+        if (race.startLine || (startPoint && refereePoint))
+            var startLine = new google.maps.Polyline({
+                path: race.startLine||[startPoint,refereePoint],
+                strokeColor: "#FFF556",
+                strokeOpacity: 1.0,
+                strokeWeight: 2,
+                map: map
+            });
+
+        // draw tracks
         _.each(tracks, function (track, index, list) {
             track.line = new google.maps.Polyline({
                 path: track.coords,
@@ -136,14 +141,7 @@ function Regata(_race) {
 
         showPlayers(_race);
 
-        time=ts;
-
-        //$('#google-map').hide();
-    }
-
-    function mapLoaded(){
-        floaded = true;
-        if (_race.hasOwnProperty('angle')) rotate(_race.angle);
+        time = ts;
     }
 
     function play() {
@@ -207,12 +205,66 @@ function Regata(_race) {
             if (point) points.push(point);
         });
         if (points.length==0) return;
-        var center = getCenter(points);
+        var zoom = map.getZoom();
+        var p1 = overlay.getProjection().fromContainerPixelToLatLng(new google.maps.Point(200,200));
+        var p2 = overlay.getProjection().fromContainerPixelToLatLng(new google.maps.Point(maph*2-200,maph*2-200));
+        if ((Math.abs(p1.k - p2.k )*0.8 > maxLat - minLat) && (Math.abs(p1.A - p2.A )*0.8 > maxLon - minLon)) map.setZoom(++zoom);
+        var hlat = Math.abs(p1.k - p2.k) / 4;
+        var hlon = Math.abs(p1.A - p2.A) / 4;
+        var c = getCenter(points);
+        if ((Math.abs(p1.k - p2.k )*0.8 < (c.maxLat - c.minLat) || (Math.abs(p1.A - p2.A )*0.8 < (c.maxLon - c.minLon)))) {
+            map.setZoom(--zoom);
+        }
+        var center = c.center;
+
+        var hlat = Math.abs(p1.k - p2.k) / 4;
+        var hlon = Math.abs(p1.A - p2.A) / 4;
+        //console.log(center, hlat, hlon, maxLat, maxLon, minLat, minLon);
+        if (center.k > maxLat - hlat) center.k = maxLat  - hlat;
+        if (center.k < minLat + hlat) center.k = minLat  + hlat;
+        if (center.A > maxLon - hlon) center.A = maxLon  - hlon;
+        if (center.A < minLon + hlon) center.A = minLon  + hlon;
         //if (getDistance(map.getCenter(), center) > 1){
             map.panTo(center);
         //}
 
     }
+
+    function showPlayers(race) {
+        $('#s-title').html(race.title);
+        var phtml = "";
+        _.each(race.stracks, function (track, index, list) {
+            phtml += "<div style='width: 100%; height: 20px;'>";
+            phtml += '<div class="circle" style="border: 2px solid ' + track.color + '; background:' + track.color + '">&nbsp;</div>';
+            phtml += '&nbsp;' + track.lab + " &nbsp;&nbsp;(" + track.position + " место)";
+            phtml += "</div>";
+        });
+        $('#player-table').html(phtml);
+    }
+
+    function rotate(_angle){
+        angle = _angle;
+        if (angle>360)angle=0;
+        if (angle<0)angle=360;
+        var tr = 'rotate(-'+_angle+'deg)';
+        $("#map-canvas").css({
+            '-webkit-transform': tr,
+            '-moz-transform': tr
+        });
+        sin = Math.sin(angle*Math.PI/180);
+        cos = Math.cos(angle*Math.PI/180);
+        divh = (Math.abs(sin) * $("#map-canvas").height() + Math.abs(cos) * $("#map-canvas").width())*0.5;
+        //$('#s-angle').html(angle+'°');
+    }
+
+    function getLatLng(mx,my){
+        mx -= $("#map-canvas").offset().left;
+        my -= $("#map-canvas").offset().top;
+        return overlay.getProjection().fromContainerPixelToLatLng(new google.maps.Point((((mx-divh) * cos) - ((my-divh) * sin)) + maph, (((mx-divh) * sin) + ((my-divh) * cos)) + maph));
+    }
+
+
+    //  ---------  Events  -----------
 
     function bindEvents() {
         var defSpeed, _fplaing;
@@ -255,7 +307,6 @@ function Regata(_race) {
             animate();
 
         });
-
 
         $('#bt-down').click(function () {
             //if (timePerSec > 0)timePerSec--;
@@ -301,7 +352,8 @@ function Regata(_race) {
         });
 
         google.maps.event.addListener( map, 'idle', function() {
-           if (!floaded) mapLoaded();
+           fidle=true;
+           if (!floaded) onMapLoaded();
            //if (fzoom) centerAfterZoom();
         });
 
@@ -310,51 +362,18 @@ function Regata(_race) {
             if (ffollow) $(this).css('background-color', '#FFF6AC');
             else $(this).css('background-color', 'white');
         });
+        $("#map-canvas").on('mousemove',onMouseMove);
+        $(window).on('mouseup',onMouseUp).on('mouseout', onMouseOut);
+        $("#map-canvas").on('mousedown',onMouseDown);
+        $("#map-canvas").on('mousewheel DOMMouseScroll', onScroll);
     }
 
-    function centerAfterZoom(){
-        var nPos = getLatLng(e.clientX, e.clientY);
-        var dk = oPos.k - nPos.k;
-        var dA = oPos.A - nPos.A;
-        map.setCenter(new google.maps.LatLng(oldCenter.k-dk, oldCenter.A-dA));
+    function onMapLoaded(){
+        floaded = true;
+        if (_race.hasOwnProperty('angle')) rotate(_race.angle);
     }
 
-    function showPlayers(race) {
-        $('#s-title').html(race.title);
-        var phtml = "";
-        _.each(race.stracks, function (track, index, list) {
-            phtml += "<div style='width: 100%; height: 20px;'>";
-            phtml += '<div class="circle" style="border: 2px solid ' + track.color + '; background:' + track.color + '">&nbsp;</div>';
-            phtml += '&nbsp;' + track.lab + " &nbsp;&nbsp;(" + track.position + " место)";
-            phtml += "</div>";
-        });
-        $('#player-table').html(phtml);
-    }
-
-    function rotate(_angle){
-        angle = _angle;
-        if (angle>360)angle=0;
-        if (angle<0)angle=360;
-        var tr = 'rotate(-'+_angle+'deg)';
-        $("#map-canvas").css({
-            '-webkit-transform': tr,
-            '-moz-transform': tr
-        });
-        sin = Math.sin(angle*Math.PI/180);
-        cos = Math.cos(angle*Math.PI/180);
-        divh = (Math.abs(sin) * $("#map-canvas").height() + Math.abs(cos) * $("#map-canvas").width())*0.5;
-        //$('#s-angle').html(angle+'°');
-    }
-
-    function getLatLng(mx,my){
-        mx -= $("#map-canvas").offset().left;
-        my -= $("#map-canvas").offset().top;
-        //var x = (((mx-divh) * cos) - ((my-divh) * sin)) + maph;
-        //var y = (((mx-divh) * sin) + ((my-divh) * cos)) + maph;
-        return overlay.getProjection().fromContainerPixelToLatLng(new google.maps.Point((((mx-divh) * cos) - ((my-divh) * sin)) + maph, (((mx-divh) * sin) + ((my-divh) * cos)) + maph));
-    }
-
-    $("#map-canvas").on('mousemove',function(e){
+    function onMouseMove(e){
         var nPos = getLatLng(e.clientX, e.clientY);
         var mx = e.clientX - $("#map-canvas").offset().left;
         var my = e.clientY - $("#map-canvas").offset().top;
@@ -364,35 +383,35 @@ function Regata(_race) {
             map.panBy(xx-x, yy-y);
             xx=x; yy=y;
         }
-    });
-    $(window).on('mouseup',function(e){
-        fdrag=false;
-    }).on('mouseout',function(){fdrag=false});
-    $("#map-canvas").on('mousedown',function(e){
+    }
+
+    function onMouseUp(){ fdrag = false; }
+
+    function onMouseOut(){ fdrag = false; }
+
+    function onMouseDown(e){
         fdrag = true;
         var mx = e.clientX - $("#map-canvas").offset().left;
         var my = e.clientY - $("#map-canvas").offset().top;
         xx = (((mx-divh) * cos) - ((my-divh) * sin)) + maph;
         yy = (((mx-divh) * sin) + ((my-divh) * cos)) + maph;
-    });
-    $("#map-canvas").on('mousewheel DOMMouseScroll',function(e){
+    }
+
+    function onScroll(e){
         var delta = e.originalEvent.detail < 0 || e.originalEvent.wheelDelta > 0 ? 1 : -1;
         var zoom = map.getZoom();
-        var oPot = getLatLng(maph, maph);
         if (delta>0){
             map.setZoom(++zoom);
         }
         else {
-            if (zoom>14){
+            if (zoom>12){
                 map.setZoom(--zoom);
-            } else return;
+            }
         }
-       // if (ffollow) return;
-        //map.setCenter(getLatLng(maph, maph));
-        //var nPot = overlay.getProjection().fromLatLngToContainerPixel(oPot);
-        //var center = getLatLng(maph, maph);
-        //map.panBy(nPot.x-maph, nPot.y-maph);
-    });
+        if (ffollow) moveToPoints();
+    }
+
+
 }
 
 
@@ -434,34 +453,63 @@ var Track = function (strack) {
     this.color = strack.color;
     this.label = strack.lab;
     this.delta = 0;
+    this.startPoint = null;
+    this.startTime = 0;
+    this.refereePoint = null;
+    this.markers = [];
+
     var that = this;
 
-    var spoint, point, prev, time, oldTime = 0, lat, lon;
+
     if (strack.hasOwnProperty('delta'))that.delta = strack.delta;
-    _.each(strack.spoints, function (element, index, list) {
-        spoint = element.split(',');
-        if (spoint.length < 6) return;
-        time = moment(spoint[5] + ' ' + spoint[6].replace(/\n|\r/g, "") + ' +' + strack.timezone, "DD.MM.YYYY HH:mm:ss Z").valueOf();
-        time += that.delta*1000;
-        if (!time > 0 /*|| time-oldTime<minDelta*/) return;
-        if (that.ts == 0)that.ts = time;
-        oldTime = time;
+    initPoints(strack.spoints);
+    initGoogleMapGraph();
 
-        lat = parseFloat(spoint[0]);
-        lon = parseFloat(spoint[1]);
+    function initPoints(spoints){
+        var spoint, point, prev, time, oldTime = 0, lat, lon;
+        _.each(spoints, function (element, index, list) {
+            spoint = element.split(',');
+            if (spoint.length < 4) return;
+            var type = spoint[0].substring(0,1); spoint[0] = spoint[0].substring(1);
+            lat = parseFloat(spoint[0]);
+            lon = parseFloat(spoint[1]);
+            time = moment(spoint[2] + ' ' + spoint[3].replace(/\n|\r/g, ""), "DD.MM.YYYY HH:mm:ss").valueOf();
+            time += that.delta*1000;
+            switch (type) {
+                case '!': that.startTime = time; break;
+                case '&': that.refereePoint = new google.maps.LatLng(lat, lon); break;
+                case '$': that.startPoint = new google.maps.LatLng(lat, lon); break;
+                case '@': that.markers.push(new google.maps.LatLng(lat, lon)); break;
+                case '#':
+                    if (!time > 0 /*|| time-oldTime<minDelta*/) return;
+                    if (that.ts == 0)that.ts = time;
+                    oldTime = time;
 
-        if (that.maxLat == null || that.maxLat < lat) that.maxLat = lat;
-        if (that.maxLon == null || that.maxLon < lon) that.maxLon = lon;
-        if (that.minLat == null || that.minLat > lat) that.minLat = lat;
-        if (that.minLon == null || that.minLon > lon) that.minLon = lon;
-        point = new Point(time, lat, lon);
-        point.calcDistance(prev);
-        that.points.push(point);
-        that.coords.push(point.LatLng);
-        prev = point;
-        that.distance = point.totalDistance;
-        that.te = time;
-    });
+                    if (that.maxLat == null || that.maxLat < lat) that.maxLat = lat;
+                    if (that.maxLon == null || that.maxLon < lon) that.maxLon = lon;
+                    if (that.minLat == null || that.minLat > lat) that.minLat = lat;
+                    if (that.minLon == null || that.minLon > lon) that.minLon = lon;
+                    point = new Point(time, lat, lon);
+                    point.calcDistance(prev);
+                    that.points.push(point);
+                    that.coords.push(point.LatLng);
+                    prev = point;
+                    that.distance = point.totalDistance;
+                    that.te = time;
+                    break;
+            }
+        });
+    }
+
+    function initGoogleMapGraph(){
+        that.marker = {
+            path: google.maps.SymbolPath.CIRCLE,
+            scale: 3,
+            fillOpacity: 1,
+            fillColor: that.color,
+            strokeColor: that.color
+        };
+    }
 
     this.caclDistance = function (time) {
         if (time >= that.te) return that.distance;
@@ -509,7 +557,10 @@ function getCenter(points){
         if (minLat == null || minLat > point.k) minLat = point.k;
         if (minLon == null || minLon > point.A) minLon = point.A;
     });
-    return new google.maps.LatLng(minLat + (maxLat - minLat)*0.5, minLon + (maxLon - minLon)*0.5);
+    return {
+        center: new google.maps.LatLng(minLat + (maxLat - minLat)*0.5, minLon + (maxLon - minLon)*0.5),
+        minLat : minLat, maxLat : maxLat, minLon : minLon, maxLon : maxLon
+    };
 }
 
 var getDistance = function(p1, p2) { // in meters from points
