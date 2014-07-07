@@ -96,7 +96,7 @@ function Regata(_race) {
                 fillOpacity: 1,
                 strokeWeight: 1,
                 'map': map,
-                scale: 10,
+                scale: 500,
                 'radius': 10,
                 'strokeColor': '#FFF556'
             });
@@ -208,26 +208,39 @@ function Regata(_race) {
         var zoom = map.getZoom();
         var p1 = overlay.getProjection().fromContainerPixelToLatLng(new google.maps.Point(200,200));
         var p2 = overlay.getProjection().fromContainerPixelToLatLng(new google.maps.Point(maph*2-200,maph*2-200));
-        if ((Math.abs(p1.k - p2.k )*0.8 > maxLat - minLat) && (Math.abs(p1.A - p2.A )*0.8 > maxLon - minLon)) map.setZoom(++zoom);
+
+        if ((Math.abs(p1.k - p2.k )*0.8 > maxLat - minLat) && (Math.abs(p1.B - p2.B )*0.8 > maxLon - minLon)) map.setZoom(++zoom);
+
         var hlat = Math.abs(p1.k - p2.k) / 4;
-        var hlon = Math.abs(p1.A - p2.A) / 4;
+        var hlon = Math.abs(p1.B - p2.B) / 4;
         var c = getCenter(points);
-        if ((Math.abs(p1.k - p2.k )*0.8 < (c.maxLat - c.minLat) || (Math.abs(p1.A - p2.A )*0.8 < (c.maxLon - c.minLon)))) {
+        var dis = distanceToMarkers(c.center);
+        if ((Math.abs(p1.k - p2.k )*0.8 < (c.maxLat - c.minLat) || (Math.abs(p1.B - p2.B )*0.8 < (c.maxLon - c.minLon)))) {
             map.setZoom(--zoom);
+        } else {
+            if (zoom<17 && dis && dis<400 &&
+                (Math.abs(p1.k - p2.k )*0.8 > (c.maxLat - c.minLat)*2 && (Math.abs(p1.B - p2.B )*0.8 > (c.maxLon - c.minLon)*2)))
+                map.setZoom(++zoom);
+            else if (zoom>16 && dis && dis>500) map.setZoom(--zoom);
         }
         var center = c.center;
 
-        var hlat = Math.abs(p1.k - p2.k) / 4;
-        var hlon = Math.abs(p1.A - p2.A) / 4;
-        //console.log(center, hlat, hlon, maxLat, maxLon, minLat, minLon);
+        hlat = Math.abs(p1.k - p2.k) / 3;
+        hlon = Math.abs(p1.B - p2.B) / 3;
         if (center.k > maxLat - hlat) center.k = maxLat  - hlat;
         if (center.k < minLat + hlat) center.k = minLat  + hlat;
-        if (center.A > maxLon - hlon) center.A = maxLon  - hlon;
-        if (center.A < minLon + hlon) center.A = minLon  + hlon;
-        //if (getDistance(map.getCenter(), center) > 1){
-            map.panTo(center);
-        //}
+        if (center.B > maxLon - hlon) center.B = maxLon  - hlon;
+        if (center.B < minLon + hlon) center.B = minLon  + hlon;
+        map.panTo(center);
+    }
 
+    function distanceToMarkers(p){
+        var result = null, d;
+        _.each(markers, function (element, index, list) {
+            d = getDistance(element, p);
+            if (result == null || result > d) result = d;
+        });
+        return result;
     }
 
     function showPlayers(race) {
@@ -505,6 +518,7 @@ var Track = function (strack) {
         that.marker = {
             path: google.maps.SymbolPath.CIRCLE,
             scale: 3,
+            radius: 8,
             fillOpacity: 1,
             fillColor: that.color,
             strokeColor: that.color
@@ -553,9 +567,9 @@ function getCenter(points){
     var minLat = null, maxLat = null, minLon = null, maxLon = null;
     _.each(points, function (point, index, list) {
         if (maxLat == null || maxLat < point.k) maxLat = point.k;
-        if (maxLon == null || maxLon < point.A) maxLon = point.A;
+        if (maxLon == null || maxLon < point.B) maxLon = point.B;
         if (minLat == null || minLat > point.k) minLat = point.k;
-        if (minLon == null || minLon > point.A) minLon = point.A;
+        if (minLon == null || minLon > point.B) minLon = point.B;
     });
     return {
         center: new google.maps.LatLng(minLat + (maxLat - minLat)*0.5, minLon + (maxLon - minLon)*0.5),

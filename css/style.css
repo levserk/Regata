@@ -9,10 +9,9 @@ html, body, #map-canvas {
     height: 1400px;
     width: 1400px;
     margin: 0 auto;
-    /*top: 50%;*/
-    /*left: 50%;*/
-    margin-top: -240px;
+    margin-top: 0px;
     margin-left: -250px;
+    top: -250px;
 }
 #google-map{
     overflow: hidden;
