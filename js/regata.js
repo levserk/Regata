@@ -42,7 +42,7 @@ function loadTrack(tr) {
     $(".button").hide();
     var race = races[tr];
 
-    _.each(race.stracks, function (element, index, list) {
+    race.stracks.forEach(function (element, index, list) {
         $.ajax({url: element.url, async: false, cache: false}).done(function (strack) {
             element.spoints = strack.split('\n').slice(6);
         });
@@ -54,10 +54,10 @@ function loadTrack(tr) {
 
 function Regata(_race) {
     var tracks;
-    var minLat, maxLat, minLon, maxLon, ts, te, deltaTime, timePerSec = 40, time;
+    var minLat, maxLat, minLng, maxLng,  center, ts, te, deltaTime, timePerSec = 40, time;
     var playInterval, speedInterval, rotateInterval, fplaying=false, frewind=false, floaded=false, fzoom=false, fdrag=false;
     var ffollow = false, fidle=false;
-    var oldCenter, oPos;
+    var xx, yy;
     var refereePoint, startPoint, markers;
     init(_race);
 
@@ -69,13 +69,13 @@ function Regata(_race) {
         var track;
         tracks = [];
 
-        _.each(race.stracks, function (element, index, list) {
+        race.stracks.forEach(function (element, index, list) {
             track = new Track(element);
             tracks.push(track);
             if (maxLat == null || maxLat < track.maxLat) maxLat = track.maxLat;
-            if (maxLon == null || maxLon < track.maxLon) maxLon = track.maxLon;
+            if (maxLng == null || maxLng < track.maxLng) maxLng = track.maxLng;
             if (minLat == null || minLat > track.minLat) minLat = track.minLat;
-            if (minLon == null || minLon > track.minLon) minLon = track.minLon;
+            if (minLng == null || minLng > track.minLng) minLng = track.minLng;
             if (ts == null || ts > track.ts) ts = track.ts;
             if (te == null || te < track.te) te = track.te;
             if (track.refereePoint) refereePoint = track.refereePoint;
@@ -83,13 +83,13 @@ function Regata(_race) {
             if (track.markers.length>0) markers = track.markers;
         });
 
-        mapOptions.center = new google.maps.LatLng(minLat + (maxLat - minLat) * 0.5, minLon + (maxLon - minLon) * 0.5);
+        mapOptions.center = new google.maps.LatLng(minLat + (maxLat - minLat) * 0.5, minLng + (maxLng - minLng) * 0.5);
         map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
         if (race.markers) markers = race.markers;
 
         // draw markers
-        _.each(markers, function (element, index, list) {
-            var circle = new google.maps.Circle({
+        markers.forEach(function (element, index, list) {
+            element.circle = new google.maps.Circle({
                 'center': element,
                 'clickable': false,
                 'fillColor': "#FFF556",
@@ -113,7 +113,7 @@ function Regata(_race) {
             });
 
         // draw tracks
-        _.each(tracks, function (track, index, list) {
+        tracks.forEach(function (track, index, list) {
             track.line = new google.maps.Polyline({
                 path: track.coords,
                 icons: [
@@ -163,7 +163,7 @@ function Regata(_race) {
         clearInterval(playInterval);
         $('#bar').val(time);
         time = ts;
-        _.each(tracks, function (track, index, list) {
+        tracks.forEach(function (track, index, list) {
             icon = track.line.get('icons');
             icon[0].offset = '100%';
             track.line.set('icons', icon);
@@ -188,55 +188,69 @@ function Regata(_race) {
     }
 
     function animate() {
-        _.each(tracks, function (track, index, list) {
-            icon = track.line.get('icons');
+        for (var i=0; i<tracks.length; i++){
+            var track = tracks[i];
+            var icon = track.line.get('icons');
             var distance =  track.caclDistance(time);
             icon[0].offset = distance / track.distance * 100 + '%';
             track.line.set('icons', icon);
-        });
+        }
         $('#s-cur-time').html(formatGameTimeMS(time - ts));
         if (ffollow)moveToPoints();
     }
 
     function moveToPoints(){
         var points = [], point;
-        _.each(tracks, function (track, index, list) {
-            point = track.getLatLon(time);
+        for (var i=0; i<tracks.length; i++){
+            point = tracks[i].getLatLng(time);
             if (point) points.push(point);
-        });
+        }
         if (points.length==0) return;
         var zoom = map.getZoom();
         var p1 = overlay.getProjection().fromContainerPixelToLatLng(new google.maps.Point(200,200));
         var p2 = overlay.getProjection().fromContainerPixelToLatLng(new google.maps.Point(maph*2-200,maph*2-200));
 
-        if ((Math.abs(p1.k - p2.k )*0.8 > maxLat - minLat) && (Math.abs(p1.B - p2.B )*0.8 > maxLon - minLon)) map.setZoom(++zoom);
+        if ((Math.abs(p1.lat() - p2.lat())*0.8 > maxLat - minLat) && (Math.abs(p1.lng() - p2.lng())*0.8 > maxLng - minLng)) map.setZoom(++zoom);
 
-        var hlat = Math.abs(p1.k - p2.k) / 4;
-        var hlon = Math.abs(p1.B - p2.B) / 4;
+        var hlat = Math.abs(p1.lat() - p2.lat()) / 4;
+        var hlng = Math.abs(p1.lng() - p2.lng()) / 4;
         var c = getCenter(points);
-        var dis = distanceToMarkers(c.center);
-        if ((Math.abs(p1.k - p2.k )*0.8 < (c.maxLat - c.minLat) || (Math.abs(p1.B - p2.B )*0.8 < (c.maxLon - c.minLon)))) {
+
+        if ((Math.abs(p1.lat() - p2.lat() )*0.8 < (c.maxLat - c.minLat) || (Math.abs(p1.lng() - p2.lng())*0.8 < (c.maxLng - c.minLng)))) {
             map.setZoom(--zoom);
         } else {
+            var dis = distanceToMarkers(c.center);
             if (zoom<17 && dis && dis<400 &&
-                (Math.abs(p1.k - p2.k )*0.8 > (c.maxLat - c.minLat)*2 && (Math.abs(p1.B - p2.B )*0.8 > (c.maxLon - c.minLon)*2)))
-                map.setZoom(++zoom);
+                (Math.abs(p1.lat() - p2.lat())*0.8 > (c.maxLat - c.minLat)*2 &&
+                (Math.abs(p1.lng() - p2.lng())*0.8 > (c.maxLng - c.minLng)*2)))
+                    map.setZoom(++zoom);
             else if (zoom>16 && dis && dis>500) map.setZoom(--zoom);
-        }
-        var center = c.center;
+            else if (center){
+                var dLat = (c.center.lat() - center.lat())*100;
+                var dLng = (c.center.lng() - center.lng())*100;
+                if ((Math.abs(p1.lat() - p2.lat())*0.8 > (c.maxLat - c.minLat) + dLat*2 &&
+                    (Math.abs(p1.lng() - p2.lng())*0.8 > (c.maxLng - c.minLng) + dLng*2))){
+                    c.center.lat(c.center.lat()+dLat);
+                    c.center.lng(c.center.lng()+dLng);
+                }
+            }
 
-        hlat = Math.abs(p1.k - p2.k) / 3;
-        hlon = Math.abs(p1.B - p2.B) / 3;
-        if (center.k > maxLat - hlat) center.k = maxLat  - hlat;
-        if (center.k < minLat + hlat) center.k = minLat  + hlat;
-        if (center.B > maxLon - hlon) center.B = maxLon  - hlon;
-        if (center.B < minLon + hlon) center.B = minLon  + hlon;
+        }
+
+        center = c.center;
+
+        hlat = Math.abs(p1.lat() - p2.lat()) / 3;
+        hlng = Math.abs(p1.lng() - p2.lng()) / 3;
+        if (center.lat() > maxLat - hlat) center.lat(maxLat  - hlat);
+        if (center.lat() < minLat + hlat) center.lat(minLat  + hlat);
+        if (center.lng() > maxLng - hlng) center.lng(maxLng  - hlng);
+        if (center.lng() < minLng + hlng) center.lng(minLng  + hlng);
         map.panTo(center);
     }
 
     function distanceToMarkers(p){
         var result = null, d;
-        _.each(markers, function (element, index, list) {
+        markers.forEach(function (element, index, list) {
             d = getDistance(element, p);
             if (result == null || result > d) result = d;
         });
@@ -246,7 +260,7 @@ function Regata(_race) {
     function showPlayers(race) {
         $('#s-title').html(race.title);
         var phtml = "";
-        _.each(race.stracks, function (track, index, list) {
+        race.stracks.forEach(function (track, index, list) {
             phtml += "<div style='width: 100%; height: 20px;'>";
             phtml += '<div class="circle" style="border: 2px solid ' + track.color + '; background:' + track.color + '">&nbsp;</div>';
             phtml += '&nbsp;' + track.lab + " &nbsp;&nbsp;(" + track.position + " место)";
@@ -290,8 +304,8 @@ function Regata(_race) {
                 if (!fplaying) play();
         }).mouseup(function () {
                 timePerSec = defSpeed;
-                if (!_fplaing) pause();
                 frewind = false;
+                if (!_fplaing) pause();
             });
 
         $('#bt-next').mousedown(function () {
@@ -430,21 +444,21 @@ function Regata(_race) {
 
 // ------------------ Classes ---------------------
 
-var Point = function (_t, _lat, _lon) {
+var Point = function (_t, _lat, _lng) {
     this.time = _t;
     this.lat = _lat;
-    this.lon = _lon;
-    this.LatLng = new google.maps.LatLng(_lat, _lon);
+    this.lng = _lng;
+    this.LatLng = new google.maps.LatLng(_lat, _lng);
     this.distance = 0;
     this.totalDistance = 0;
     this.calcDistance = function (point) {
         if (!point) return;
         var R = 6378137; // Earth’s mean radius in meter
         var dLat = rad(point.lat - that.lat);
-        var dLong = rad(point.lon- that.lon);
+        var dLngg = rad(point.lng- that.lng);
         var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
             Math.cos(rad(that.lat)) * Math.cos(rad(point.lat)) *
-                Math.sin(dLong / 2) * Math.sin(dLong / 2);
+                Math.sin(dLngg / 2) * Math.sin(dLngg / 2);
         var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         that.distance = R * c;
         that.totalDistance = point.totalDistance + that.distance;
@@ -457,8 +471,8 @@ var Track = function (strack) {
     this.coords = [];
     this.minLat = null;
     this.maxLat = null;
-    this.minLon = null;
-    this.maxLon = null;
+    this.minLng = null;
+    this.maxLng = null;
     this.distance = 0;
     this.ts = 0;
     this.te = 0;
@@ -479,30 +493,30 @@ var Track = function (strack) {
     initGoogleMapGraph();
 
     function initPoints(spoints){
-        var spoint, point, prev, time, oldTime = 0, lat, lon;
-        _.each(spoints, function (element, index, list) {
+        var spoint, point, prev, time, oldTime = 0, lat, lng;
+        spoints.forEach(function (element, index, list) {
             spoint = element.split(',');
             if (spoint.length < 4) return;
             var type = spoint[0].substring(0,1); spoint[0] = spoint[0].substring(1);
             lat = parseFloat(spoint[0]);
-            lon = parseFloat(spoint[1]);
+            lng = parseFloat(spoint[1]);
             time = moment(spoint[2] + ' ' + spoint[3].replace(/\n|\r/g, ""), "DD.MM.YYYY HH:mm:ss").valueOf();
             time += that.delta*1000;
             switch (type) {
                 case '!': that.startTime = time; break;
-                case '&': that.refereePoint = new google.maps.LatLng(lat, lon); break;
-                case '$': that.startPoint = new google.maps.LatLng(lat, lon); break;
-                case '@': that.markers.push(new google.maps.LatLng(lat, lon)); break;
+                case '&': that.refereePoint = new google.maps.LatLng(lat, lng); break;
+                case '$': that.startPoint = new google.maps.LatLng(lat, lng); break;
+                case '@': that.markers.push(new google.maps.LatLng(lat, lng)); break;
                 case '#':
                     if (!time > 0 /*|| time-oldTime<minDelta*/) return;
                     if (that.ts == 0)that.ts = time;
                     oldTime = time;
 
                     if (that.maxLat == null || that.maxLat < lat) that.maxLat = lat;
-                    if (that.maxLon == null || that.maxLon < lon) that.maxLon = lon;
+                    if (that.maxLng == null || that.maxLng < lng) that.maxLng = lng;
                     if (that.minLat == null || that.minLat > lat) that.minLat = lat;
-                    if (that.minLon == null || that.minLon > lon) that.minLon = lon;
-                    point = new Point(time, lat, lon);
+                    if (that.minLng == null || that.minLng > lng) that.minLng = lng;
+                    point = new Point(time, lat, lng);
                     point.calcDistance(prev);
                     that.points.push(point);
                     that.coords.push(point.LatLng);
@@ -528,62 +542,62 @@ var Track = function (strack) {
     this.caclDistance = function (time) {
         if (time >= that.te) return that.distance;
         if (time <= that.ts) return 0;
-        var result = 0;
-        _.each(that.points, function (point, index, list) {
-            if (result) return;
-            if (index == list.length - 1) {
-                result = point.totalDistance;
+        var point;
+        for (var i=0; i<that.points.length; i++){
+            point = that.points[i];
+            if (i == that.points.length - 1) {
+                return point.totalDistance;
             } else
-            if (time >= point.time && list[index + 1].time > time) {
-                result = point.totalDistance + (time - point.time) / (list[index + 1].time - point.time) * list[index + 1].distance;
+            if (time >= point.time && that.points[i + 1].time > time) {
+                return point.totalDistance + (time - point.time) / (that.points[i + 1].time - point.time) * that.points[i + 1].distance;
             }
-        });
-        return result;
+        }
+        return 0;
     };
 
-    this.getLatLon = function(time){
+    this.getLatLng = function(time){
         if (time >= that.te) return that.points[that.points.length-1].latLng;
         if (time <= that.ts) return 0;
-        var result = 0;
-        _.each(that.points, function (point, index, list) {
-            if (result) return;
-            if (index == list.length - 1) {
-                result = point.latLng;
+        var point;
+        for (var i=0; i<that.points.length; i++){
+            point = that.points[i];
+            if (i == that.points.length - 1) {
+                return point.latLng;
             } else
-            if (time >= point.time && list[index + 1].time > time) {
-                var nextPoint = list[index + 1];
+            if (time >= point.time && that.points[i + 1].time > time) {
+                var nextPoint = that.points[i + 1];
                 var per = (time - point.time) / (nextPoint.time - point.time);
                 var lat = point.lat + (nextPoint.lat - point.lat) * per;
-                var lon = point.lon + (nextPoint.lon - point.lon) * per;
-                result = new google.maps.LatLng(lat, lon);
+                var lng = point.lng + (nextPoint.lng - point.lng) * per;
+                return new google.maps.LatLng(lat, lng);
             }
-        });
-        return result;
+        }
+        return null;
     };
 
 };
 
 function getCenter(points){
-    var minLat = null, maxLat = null, minLon = null, maxLon = null;
-    _.each(points, function (point, index, list) {
-        if (maxLat == null || maxLat < point.k) maxLat = point.k;
-        if (maxLon == null || maxLon < point.B) maxLon = point.B;
-        if (minLat == null || minLat > point.k) minLat = point.k;
-        if (minLon == null || minLon > point.B) minLon = point.B;
+    var minLat = null, maxLat = null, minLng = null, maxLng = null;
+    points.forEach(function (point, index, list) {
+        if (maxLat == null || maxLat < point.lat()) maxLat = point.lat();
+        if (maxLng == null || maxLng < point.lng()) maxLng = point.lng();
+        if (minLat == null || minLat > point.lat()) minLat = point.lat();
+        if (minLng == null || minLng > point.lng()) minLng = point.lng();
     });
     return {
-        center: new google.maps.LatLng(minLat + (maxLat - minLat)*0.5, minLon + (maxLon - minLon)*0.5),
-        minLat : minLat, maxLat : maxLat, minLon : minLon, maxLon : maxLon
+        center: new google.maps.LatLng(minLat + (maxLat - minLat)*0.5, minLng + (maxLng - minLng)*0.5),
+        minLat : minLat, maxLat : maxLat, minLng : minLng, maxLng : maxLng
     };
 }
 
 var getDistance = function(p1, p2) { // in meters from points
     var R = 6378137; // Earth’s mean radius in meter
     var dLat = rad(p2.lat() - p1.lat());
-    var dLong = rad(p2.lng() - p1.lng());
+    var dLngg = rad(p2.lng() - p1.lng());
     var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
         Math.cos(rad(p1.lat())) * Math.cos(rad(p2.lat())) *
-            Math.sin(dLong / 2) * Math.sin(dLong / 2);
+            Math.sin(dLngg / 2) * Math.sin(dLngg / 2);
     var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     var d = R * c;
     return d; // returns the distance in meter
