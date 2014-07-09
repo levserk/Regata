@@ -15,7 +15,7 @@ html, body, #map-canvas {
 }
 #google-map{
     overflow: hidden;
-    width: 900px;
+    width: 990px;
     height: 900px;
     margin: 0 auto;
 }

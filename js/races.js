@@ -1,6 +1,6 @@
 var races = {
     '2': {
-        title:'Гонка 2 (2 день, 1 гонка, 1 круг) <br> 5 мая (Хорватия)',
+        title:'Гонка 2 (1 день, 1 круг) <br> 5 мая (Хорватия)',
         angle:310,
         stracks: [
             {
@@ -8,14 +8,14 @@ var races = {
                 lab: '23',
                 timezone: '04:00',
                 color: '#20A530',
-                position: 0
+                position: 1
             },
             {
                 url: 'races/2014-05-05/1/17.dat',
                 lab: '17',
                 timezone: '04:00',
                 color: '#FF282C',
-                position: 0,
+                position: 2,
                 delta: -140
             },
             {
@@ -23,7 +23,7 @@ var races = {
                 lab: '21',
                 timezone: '02:00',
                 color: '#FFFFFF',
-                position: 0
+                position: 10
             }
         ],
         markers: [
@@ -34,7 +34,7 @@ var races = {
         startLine: [new google.maps.LatLng(43.330993,  16.427277), new google.maps.LatLng(43.333615,  16.429723)]
     },
     '3': {
-        title:'Гонка 3 (2 день, 2 гонка, по маршруту) <br> 5 мая (Хорватия)',
+        title:'Гонка 3 (1 день,  по маршруту) <br> 5 мая (Хорватия)',
         angle:180,
         stracks: [
             {
@@ -42,22 +42,22 @@ var races = {
                 lab: '23',
                 timezone: '04:00',
                 color: '#20A530',
-                position: 0
-            },
-            {
-                url: 'races/2014-05-05/2/17.dat',
-                lab: '17',
-                timezone: '04:00',
-                color: '#FF282C',
-                position: 0,
-                delta: -140
+                position: 1
             },
             {
                 url: 'races/2014-05-05/2/21.dat',
                 lab: '21',
                 timezone: '02:00',
                 color: '#FFFFFF',
-                position: 0
+                position: 2
+            },
+            {
+                url: 'races/2014-05-05/2/17.dat',
+                lab: '17',
+                timezone: '04:00',
+                color: '#FF282C',
+                position: 5,
+                delta: -140
             }
         ],
         markers: [
@@ -68,7 +68,7 @@ var races = {
         startLine: [new google.maps.LatLng(43.499160, 16.199460), new google.maps.LatLng(43.501038, 16.197130)]
     },
     '4': {
-        title:'Гонка 4 (2 день, 1 гонка, 2 круга) <br> 6 мая (Хорватия)',
+        title:'Гонка 4 (2 день, 2 круга) <br> 6 мая (Хорватия)',
         angle:160,
         stracks: [
             {
@@ -76,14 +76,14 @@ var races = {
                 lab: '23',
                 timezone: '04:00',
                 color: '#20A530',
-                position: 0
+                position: 2
             },
             {
                 url: 'races/2014-05-06/1/17.dat',
                 lab: '17',
                 timezone: '04:00',
                 color: '#FF282C',
-                position: 0,
+                position: 5,
                 delta: -140
             },
             {
@@ -91,7 +91,7 @@ var races = {
                 lab: '19',
                 timezone: '02:00',
                 color: '#241EDF',
-                position: 0,
+                position: 7,
                 delta: 8
             }
         ],
@@ -103,30 +103,30 @@ var races = {
         startLine: [new google.maps.LatLng(43.191295,  16.365232), new google.maps.LatLng(43.190622,  16.363108)]
     },
     '5': {
-        title:'Гонка 5 (2 день, 2 гонка, 1 круг) <br> 6 мая (Хорватия)',
+        title:'Гонка 5 (2 день, 1 круг) <br> 6 мая (Хорватия)',
         angle:290,
         stracks: [
-            {
-                url: 'races/2014-05-06/2/23.dat',
-                lab: '23',
-                timezone: '04:00',
-                color: '#20A530',
-                position: 0
-            },
             {
                 url: 'races/2014-05-06/2/17.dat',
                 lab: '17',
                 timezone: '04:00',
                 color: '#FF282C',
-                position: 0,
+                position: 1,
                 delta: -140
+            },
+            {
+                url: 'races/2014-05-06/2/23.dat',
+                lab: '23',
+                timezone: '04:00',
+                color: '#20A530',
+                position: 2
             },
             {
                 url: 'races/2014-05-06/2/19.dat',
                 lab: '19',
                 timezone: '02:00',
                 color: '#241EDF',
-                position: 0,
+                position: 4,
                 delta: 8
             },
             {
@@ -134,7 +134,7 @@ var races = {
                 lab: '21',
                 timezone: '02:00',
                 color: '#FFFFFF',
-                position: 0
+                position: 5
             }
         ],
         markers: [
@@ -145,38 +145,38 @@ var races = {
         startLine: [new google.maps.LatLng(43.170342,  16.384877), new google.maps.LatLng(43.168558,  16.382806)]
     },
     '6': {
-        title:'Гонка 6 (3 день, 1 гонка, 2 круга) <br> 7 мая (Хорватия)',
+        title:'Гонка 6 (3 день, 2 круга) <br> 7 мая (Хорватия)',
         angle:120,
         stracks: [
+            {
+                url: 'races/2014-05-07/1/21.dat',
+                lab: '21',
+                timezone: '02:00',
+                color: '#FFFFFF',
+                position: 3
+            },
             {
                 url: 'races/2014-05-07/1/23.dat',
                 lab: '23',
                 timezone: '04:00',
                 color: '#20A530',
-                position: 0
+                position: 4
             },
             {
                 url: 'races/2014-05-07/1/17.dat',
                 lab: '17',
                 timezone: '04:00',
                 color: '#FF282C',
-                position: 0,
-                delta: -140
+                position: 6,
+                delta: 0
             },
             {
                 url: 'races/2014-05-07/1/19.dat',
                 lab: '19',
                 timezone: '02:00',
                 color: '#241EDF',
-                position: 0,
+                position: 8,
                 delta: 8
-            },
-            {
-                url: 'races/2014-05-07/1/21.dat',
-                lab: '21',
-                timezone: '02:00',
-                color: '#FFFFFF',
-                position: 0
             }
         ],
         markers: [
@@ -187,7 +187,7 @@ var races = {
         startLine: [new google.maps.LatLng(43.188642,  16.367088), new google.maps.LatLng(43.188595,  16.369138)]
     },
     '7': {
-        title:'Гонка 7 (3 день, 2 гонка, по маршруту) <br> 7 мая (Хорватия)',
+        title:'Гонка 7 (3 день, по маршруту) <br> 7 мая (Хорватия)',
         angle:0,
         stracks: [
             {
@@ -195,14 +195,21 @@ var races = {
                 lab: '23',
                 timezone: '04:00',
                 color: '#20A530',
-                position: 0
+                position: 1
+            },
+            {
+                url: 'races/2014-05-07/2/21.dat',
+                lab: '21',
+                timezone: '02:00',
+                color: '#FFFFFF',
+                position: 2
             },
             {
                 url: 'races/2014-05-07/2/17.dat',
                 lab: '17',
                 timezone: '04:00',
                 color: '#FF282C',
-                position: 0,
+                position: 4,
                 delta: -140
             },
             {
@@ -210,15 +217,8 @@ var races = {
                 lab: '19',
                 timezone: '02:00',
                 color: '#241EDF',
-                position: 0,
+                position: 7,
                 delta: 8
-            },
-            {
-                url: 'races/2014-05-07/2/21.dat',
-                lab: '21',
-                timezone: '02:00',
-                color: '#FFFFFF',
-                position: 0
             }
         ],
         markers: [
@@ -229,7 +229,7 @@ var races = {
         startLine: [new google.maps.LatLng(43.188577,  16.366756), new google.maps.LatLng(43.189508,  16.369288)]
     },
     '8': {
-        title:'Гонка 8 (4 день, 1 гонка, 2 круга) <br> 8 мая (Хорватия)',
+        title:'Гонка 8 (4 день, 2 круга) <br> 8 мая (Хорватия)',
         angle:228,
         stracks: [
             {
@@ -271,7 +271,7 @@ var races = {
         startLine: [new google.maps.LatLng(43.499160, 16.199460), new google.maps.LatLng(43.501038, 16.197130)]
     },
     '9': {
-        title:'Гонка 9 (4 день, 2 гонка, 1 круг) <br> 8 мая (Хорватия)',
+        title:'Гонка 9 (4 день, 1 круг) <br> 8 мая (Хорватия)',
         angle:228,
         stracks: [
             {
@@ -313,7 +313,7 @@ var races = {
         startLine: [new google.maps.LatLng(43.499160, 16.199460), new google.maps.LatLng(43.501038, 16.197130)]
     },
     '10': {
-        title:'Гонка 10 (5 день, 1 гонка, 1 круг) <br> 9 мая (Хорватия)',
+        title:'Гонка 10 (5 день, 1 круг) <br> 9 мая (Хорватия)',
         angle:242,
         stracks: [
             {

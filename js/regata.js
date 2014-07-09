@@ -1,6 +1,7 @@
 var map, mapOptions = {
     center: new google.maps.LatLng(20.291, 153.027),
     zoom: 15,
+    maxZoom: 18,
     mapTypeId: google.maps.MapTypeId.ROADMAP,
     scrollwheel: false,
     navigationControl: false,
@@ -59,11 +60,9 @@ function Regata(_race) {
     var ffollow = false, fidle=false;
     var xx, yy;
     var refereePoint, startPoint, markers;
-    init(_race);
-
     var overlay = new google.maps.OverlayView();
-    overlay.draw = function() {};
-    overlay.setMap(map);
+
+    init(_race);
 
     function init(race) {
         var track;
@@ -103,7 +102,7 @@ function Regata(_race) {
         });
 
         // draw start line
-        if (race.startLine || (startPoint && refereePoint))
+        if (race.startLine || (startPoint && refereePoint)){
             var startLine = new google.maps.Polyline({
                 path: race.startLine||[startPoint,refereePoint],
                 strokeColor: "#FFF556",
@@ -111,7 +110,12 @@ function Regata(_race) {
                 strokeWeight: 2,
                 map: map
             });
-
+            if (!startPoint && race.startLine) {
+                startPoint = race.startLine[0];
+                refereePoint = race.startLine[1];
+            }
+            //console.log(getDistance(race.startLine[0],race.startLine[1]));
+        }
         // draw tracks
         tracks.forEach(function (track, index, list) {
             track.line = new google.maps.Polyline({
@@ -129,6 +133,9 @@ function Regata(_race) {
             });
         });
 
+        overlay.draw = function() {};
+        overlay.setMap(map);
+
         bindEvents();
 
         $('#bt-pause').hide();
@@ -142,12 +149,13 @@ function Regata(_race) {
         showPlayers(_race);
 
         time = ts;
+        zoomMap(15);
     }
 
     function play() {
         if ((!time || time == te) && !frewind) time = ts;
         deltaTime = new Date();
-        playInterval = setInterval(frame, 20);
+        playInterval = setInterval(frame, 30);
         fplaying = true;
         $('#bt-play').css('background-color', '#FFF6AC');
     }
@@ -199,6 +207,30 @@ function Regata(_race) {
         if (ffollow)moveToPoints();
     }
 
+    function goToStart(){
+        var center, lat, lng;
+        if (startPoint && refereePoint){
+            center = getCenter([startPoint, refereePoint]).center;
+        } else {
+            var points = [];
+            for (var i=0; i<tracks.length; i++){
+                var point = tracks[i].getLatLng(ts,true);
+                if (point) points.push(point);
+            }
+            if (points.length>0) center = getCenter(points).center
+        }
+        var p1 = overlay.getProjection().fromContainerPixelToLatLng(new google.maps.Point(200,200));
+        var p2 = overlay.getProjection().fromContainerPixelToLatLng(new google.maps.Point(maph*2-200,maph*2-200));
+        var hlat = Math.abs(p1.lat() - p2.lat()) / 3;
+        var hlng = Math.abs(p1.lng() - p2.lng()) / 3;
+        if (center.lat() > maxLat - hlat) center.lat(maxLat  - hlat);
+        if (center.lat() < minLat + hlat) center.lat(minLat  + hlat);
+        if (center.lng() > maxLng - hlng) center.lng(maxLng  - hlng);
+        if (center.lng() < minLng + hlng) center.lng(minLng  + hlng);
+        map.panTo(center);
+        if (center) map.setCenter(center);
+    }
+
     function moveToPoints(){
         var points = [], point;
         for (var i=0; i<tracks.length; i++){
@@ -210,21 +242,21 @@ function Regata(_race) {
         var p1 = overlay.getProjection().fromContainerPixelToLatLng(new google.maps.Point(200,200));
         var p2 = overlay.getProjection().fromContainerPixelToLatLng(new google.maps.Point(maph*2-200,maph*2-200));
 
-        if ((Math.abs(p1.lat() - p2.lat())*0.8 > maxLat - minLat) && (Math.abs(p1.lng() - p2.lng())*0.8 > maxLng - minLng)) map.setZoom(++zoom);
+        if ((Math.abs(p1.lat() - p2.lat())*0.8 > maxLat - minLat) && (Math.abs(p1.lng() - p2.lng())*0.8 > maxLng - minLng)) zoomMap(++zoom);
 
         var hlat = Math.abs(p1.lat() - p2.lat()) / 4;
         var hlng = Math.abs(p1.lng() - p2.lng()) / 4;
         var c = getCenter(points);
 
         if ((Math.abs(p1.lat() - p2.lat() )*0.8 < (c.maxLat - c.minLat) || (Math.abs(p1.lng() - p2.lng())*0.8 < (c.maxLng - c.minLng)))) {
-            map.setZoom(--zoom);
+            zoomMap(--zoom);
         } else {
             var dis = distanceToMarkers(c.center);
             if (zoom<17 && dis && dis<400 &&
                 (Math.abs(p1.lat() - p2.lat())*0.8 > (c.maxLat - c.minLat)*2 &&
                 (Math.abs(p1.lng() - p2.lng())*0.8 > (c.maxLng - c.minLng)*2)))
-                    map.setZoom(++zoom);
-            else if (zoom>16 && dis && dis>500) map.setZoom(--zoom);
+                zoomMap(++zoom);
+            else if (zoom>16 && dis && dis>500) zoomMap(--zoom);
             else if (center){
                 var dLat = (c.center.lat() - center.lat())*100;
                 var dLng = (c.center.lng() - center.lng())*100;
@@ -256,6 +288,33 @@ function Regata(_race) {
         });
         return result;
     }
+
+    function zoomMap(z){
+        map.setZoom(z);
+        if (z<=15) { setMarkersRadius(12); setBoardsRadius(2); }
+        if (z==16) { setMarkersRadius(9);  setBoardsRadius(3); }
+        if (z==17) { setMarkersRadius(6);  setBoardsRadius(5); }
+        if (z >17) { setMarkersRadius(5);  setBoardsRadius(9);}
+        console.log(map.getZoom());
+    }
+
+    function setBoardsRadius(r){
+        for (var i=0; i<tracks.length; i++){
+            var track = tracks[i];
+            var icon = track.line.get('icons');
+            icon[0].icon.scale = r;
+            track.line.set('icons', icon);
+        }
+    }
+
+    function setMarkersRadius(r){
+        markers.forEach(function (marker) {
+            marker.circle.setRadius(r);
+        });
+    }
+
+    this._setMarkersRadius = setMarkersRadius;
+    this._setBoardsRadius = setBoardsRadius;
 
     function showPlayers(race) {
         $('#s-title').html(race.title);
@@ -396,6 +455,7 @@ function Regata(_race) {
     }
 
     function onMapLoaded(){
+        if (!floaded) goToStart();
         floaded = true;
         if (_race.hasOwnProperty('angle')) rotate(_race.angle);
     }
@@ -428,11 +488,11 @@ function Regata(_race) {
         var delta = e.originalEvent.detail < 0 || e.originalEvent.wheelDelta > 0 ? 1 : -1;
         var zoom = map.getZoom();
         if (delta>0){
-            map.setZoom(++zoom);
+            zoomMap(++zoom);
         }
         else {
             if (zoom>12){
-                map.setZoom(--zoom);
+                zoomMap(--zoom);
             }
         }
         if (ffollow) moveToPoints();
@@ -532,7 +592,7 @@ var Track = function (strack) {
         that.marker = {
             path: google.maps.SymbolPath.CIRCLE,
             scale: 3,
-            radius: 8,
+            radius: 5,
             fillOpacity: 1,
             fillColor: that.color,
             strokeColor: that.color
@@ -555,14 +615,15 @@ var Track = function (strack) {
         return 0;
     };
 
-    this.getLatLng = function(time){
-        if (time >= that.te) return that.points[that.points.length-1].latLng;
+    this.getLatLng = function(time, first){
+        if (first) return that.points[0].LatLng;
+        if (time >= that.te) return that.points[that.points.length-1].LatLng;
         if (time <= that.ts) return 0;
         var point;
         for (var i=0; i<that.points.length; i++){
             point = that.points[i];
             if (i == that.points.length - 1) {
-                return point.latLng;
+                return point.LatLng;
             } else
             if (time >= point.time && that.points[i + 1].time > time) {
                 var nextPoint = that.points[i + 1];
