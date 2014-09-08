@@ -1,6 +1,6 @@
 var map, mapOptions = {
     center: new google.maps.LatLng(20.291, 153.027),
-    zoom: 15,
+    zoom: 17,
     maxZoom: 18,
     mapTypeId: google.maps.MapTypeId.ROADMAP,
     scrollwheel: false,
@@ -45,7 +45,7 @@ function loadTrack(tr) {
 
     race.stracks.forEach(function (element, index, list) {
         $.ajax({url: element.url, async: false, cache: false}).done(function (strack) {
-            element.spoints = strack.split('\n').slice(6);
+            element.spoints = strack.split('\n');
         });
     });
 
@@ -61,6 +61,7 @@ function Regata(_race) {
     var xx, yy;
     var refereePoint, startPoint, markers;
     var overlay = new google.maps.OverlayView();
+    var self = this;
 
     init(_race);
 
@@ -87,6 +88,7 @@ function Regata(_race) {
         if (race.markers) markers = race.markers;
 
         // draw markers
+        if (markers)
         markers.forEach(function (element, index, list) {
             element.circle = new google.maps.Circle({
                 'center': element,
@@ -149,7 +151,7 @@ function Regata(_race) {
         showPlayers(_race);
 
         time = ts;
-        zoomMap(15);
+        zoomMap(16);
     }
 
     function play() {
@@ -234,8 +236,10 @@ function Regata(_race) {
     function moveToPoints(){
         var points = [], point;
         for (var i=0; i<tracks.length; i++){
-            point = tracks[i].getLatLng(time);
-            if (point) points.push(point);
+            if (tracks[i].line.visible && tracks[i].following){
+                point = tracks[i].getLatLng(time);
+                if (point) points.push(point);
+            }
         }
         if (points.length==0) return;
         var zoom = map.getZoom();
@@ -254,8 +258,9 @@ function Regata(_race) {
             var dis = distanceToMarkers(c.center);
             if (zoom<17 && dis && dis<400 &&
                 (Math.abs(p1.lat() - p2.lat())*0.8 > (c.maxLat - c.minLat)*2 &&
-                (Math.abs(p1.lng() - p2.lng())*0.8 > (c.maxLng - c.minLng)*2)))
+                (Math.abs(p1.lng() - p2.lng())*0.8 > (c.maxLng - c.minLng)*2))){
                 zoomMap(++zoom);
+            }
             else if (zoom>16 && dis && dis>500) zoomMap(--zoom);
             else if (center){
                 var dLat = (c.center.lat() - center.lat())*100;
@@ -498,6 +503,43 @@ function Regata(_race) {
         if (ffollow) moveToPoints();
     }
 
+    this.getTracks = function(){
+        return tracks;
+    };
+
+    this.showTrack = function(id){
+        if (!id) {
+            for (var i=0; i< tracks.length; i++) { tracks[i].line.setVisible(true); }
+            return;
+        }
+        var track = tracks[id];
+        if (!track) return;
+        track.line.setVisible(true);
+    };
+
+    this.hideTrack = function(id){
+        var track = tracks[id];
+        if (!track) return;
+        track.line.setVisible(false);
+    };
+
+
+    this.followTrack = function(id){
+        if (!id) {
+            for (var i=0; i< tracks.length; i++) { tracks[i].following = true; }
+            return;
+        }
+        var track = tracks[id];
+        if (!track) return;
+        track.following = true;
+    };
+
+    this.unfollowTrack = function(id){
+        var track = tracks[id];
+        if (!track) return;
+        track.following = false;
+    };
+
 
 }
 
@@ -544,6 +586,7 @@ var Track = function (strack) {
     this.startTime = 0;
     this.refereePoint = null;
     this.markers = [];
+    this.following = true;
 
     var that = this;
 
@@ -564,8 +607,8 @@ var Track = function (strack) {
             time += that.delta*1000;
             switch (type) {
                 case '!': that.startTime = time; break;
-                case '&': that.refereePoint = new google.maps.LatLng(lat, lng); break;
-                case '$': that.startPoint = new google.maps.LatLng(lat, lng); break;
+                case '&': that.refereePoint = new google.maps.LatLng(lat, lng); that.markers.push(that.refereePoint); break;
+                case '$': that.startPoint = new google.maps.LatLng(lat, lng); that.markers.push(that.startPoint); break;
                 case '@': that.markers.push(new google.maps.LatLng(lat, lng)); break;
                 case '#':
                     if (!time > 0 /*|| time-oldTime<minDelta*/) return;
