@@ -1,6 +1,6 @@
 var map, mapOptions = {
     center: new google.maps.LatLng(20.291, 153.027),
-    zoom: 17,
+    zoom: 12,
     maxZoom: 18,
     mapTypeId: google.maps.MapTypeId.ROADMAP,
     scrollwheel: false,
@@ -52,12 +52,31 @@ function loadTrack(tr) {
     regata = new Regata(race);
 }
 
+function loadTracks(data){
+    $("#map-canvas").show();
+    $(".button").hide();
+    if (!data) data = users;
+    var races = {}, race;
+    races.stracks=[];
+    for (var user in data){
+        race = data[user];
+        if (race.color=="") race.color = "000000";
+        races.stracks.push({
+            lab : user.toString(),
+            spoints : race.track,
+            color: "#"+race.color
+        });
+    }
+    regata = new Regata(races);
+    regata.setShowRealTime(true);
+}
+
 
 function Regata(_race) {
     var tracks;
     var minLat, maxLat, minLng, maxLng,  center, ts, te, deltaTime, timePerSec = 40, time;
     var playInterval, speedInterval, rotateInterval, fplaying=false, frewind=false, floaded=false, fzoom=false, fdrag=false;
-    var ffollow = false, fidle=false;
+    var ffollow = false, fidle=false, fshowrealtime=false;
     var xx, yy;
     var refereePoint, startPoint, markers;
     var overlay = new google.maps.OverlayView();
@@ -151,7 +170,7 @@ function Regata(_race) {
         showPlayers(_race);
 
         time = ts;
-        zoomMap(16);
+        //zoomMap(16);
     }
 
     function play() {
@@ -205,7 +224,8 @@ function Regata(_race) {
             icon[0].offset = distance / track.distance * 100 + '%';
             track.line.set('icons', icon);
         }
-        $('#s-cur-time').html(formatGameTimeMS(time - ts));
+        if (fshowrealtime)  $('#s-cur-time').html(moment(time).format("HH:mm:ss"));
+        else $('#s-cur-time').html(formatGameTimeMS(time - ts));
         if (ffollow)moveToPoints();
     }
 
@@ -287,6 +307,7 @@ function Regata(_race) {
 
     function distanceToMarkers(p){
         var result = null, d;
+        if (!markers) return null;
         markers.forEach(function (element, index, list) {
             d = getDistance(element, p);
             if (result == null || result > d) result = d;
@@ -296,8 +317,8 @@ function Regata(_race) {
 
     function zoomMap(z){
         map.setZoom(z);
-        if (z<=15) { setMarkersRadius(12); setBoardsRadius(2); }
-        if (z==16) { setMarkersRadius(9);  setBoardsRadius(3); }
+        //if (z<=15) { setMarkersRadius(12); setBoardsRadius(3); }
+        if (z<=16) { setMarkersRadius(9);  setBoardsRadius(3); }
         if (z==17) { setMarkersRadius(6);  setBoardsRadius(5); }
         if (z >17) { setMarkersRadius(5);  setBoardsRadius(9);}
         console.log(map.getZoom());
@@ -313,6 +334,7 @@ function Regata(_race) {
     }
 
     function setMarkersRadius(r){
+        if (markers)
         markers.forEach(function (marker) {
             marker.circle.setRadius(r);
         });
@@ -325,13 +347,33 @@ function Regata(_race) {
         $('#s-title').html(race.title);
         var phtml = "";
         race.stracks.forEach(function (track, index, list) {
-            phtml += "<div style='width: 100%; height: 20px;'>";
-            phtml += '<div class="circle" style="border: 2px solid ' + track.color + '; background:' + track.color + '">&nbsp;</div>';
-            phtml += '&nbsp;' + track.lab + " &nbsp;&nbsp;(" + track.position + " место)";
+            phtml += "<div style='width: 100%; height: 20px;'>";	
+			phtml += '<input style="float:left;margin-right:5px" class="showPlayer" id="'+index+'" type="checkbox" checked>';
+            phtml += '<div class="circle" style="border: 2px solid ' + track.color + '; background:' + track.color + '">&nbsp;</div>';			
+            phtml += '&nbsp;' + track.lab ;//+ " &nbsp;&nbsp;(" + track.position + " место)";
             phtml += "</div>";
         });
+		//phtml +='<button style="width:100px;margin-top:10px" class="bt-speed" id="hide_all_Players">скрыть всех</button>';
         $('#player-table').html(phtml);
     }
+	
+	$('#hide_all_Players').click(function(){
+		console.log(race.stracks);
+		$('.showPlayer').each(function(){
+			var id=$(this).attr('id');
+			$(this).removeAttr('checked');
+			regata.hideTrack(id);
+		});	
+	});
+	
+	$('.showPlayer').change(function(){
+		var id=$(this).attr('id');
+		if($(this).prop("checked")==false){
+			regata.hideTrack(id);
+		} else{
+			regata.showTrack(id);
+		}
+	});
 
     function rotate(_angle){
         angle = _angle;
@@ -460,7 +502,7 @@ function Regata(_race) {
     }
 
     function onMapLoaded(){
-        if (!floaded) goToStart();
+        //if (!floaded) goToStart();
         floaded = true;
         if (_race.hasOwnProperty('angle')) rotate(_race.angle);
     }
@@ -496,7 +538,7 @@ function Regata(_race) {
             zoomMap(++zoom);
         }
         else {
-            if (zoom>12){
+            if (zoom>8){
                 zoomMap(--zoom);
             }
         }
@@ -508,24 +550,26 @@ function Regata(_race) {
     };
 
     this.showTrack = function(id){
-        if (!id) {
+        if (id != 0 && !id) {
             for (var i=0; i< tracks.length; i++) { tracks[i].line.setVisible(true); }
             return;
         }
         var track = tracks[id];
         if (!track) return;
         track.line.setVisible(true);
+        updateTimeLabels();
     };
 
     this.hideTrack = function(id){
         var track = tracks[id];
         if (!track) return;
         track.line.setVisible(false);
+        updateTimeLabels();
     };
 
 
     this.followTrack = function(id){
-        if (!id) {
+        if (id != 0 && !id) {
             for (var i=0; i< tracks.length; i++) { tracks[i].following = true; }
             return;
         }
@@ -539,6 +583,40 @@ function Regata(_race) {
         if (!track) return;
         track.following = false;
     };
+
+    this.setShowRealTime = function(v){
+        fshowrealtime = v;
+        updateTimeLabels();
+    };
+
+    function updateTimeLabels(){
+        ts = null; te = null; maxLat = null; maxLng = null; minLat = null; minLng = null;
+        tracks.forEach(function(element){
+            if (element.line.visible){
+                if (maxLat == null || maxLat < element.maxLat) maxLat = element.maxLat;
+                if (maxLng == null || maxLng < element.maxLng) maxLng = element.maxLng;
+                if (minLat == null || minLat > element.minLat) minLat = element.minLat;
+                if (minLng == null || minLng > element.minLng) minLng = element.minLng;
+                if (ts == null || ts > element.ts) ts = element.ts;
+                if (te == null || te < element.te) te = element.te;
+           }
+        });
+        map.setCenter(new google.maps.LatLng(minLat + (maxLat - minLat) * 0.5, minLng + (maxLng - minLng) * 0.5));
+        time = ts;
+        $('#bar').attr('max', te);
+        $('#bar').attr('min', ts);
+        $('#bar').val(time);
+        if (fshowrealtime) {
+            $('#s-nul-time').html(moment(ts).format("HH:mm:ss"));
+            $('#s-total-time').html(moment(te).format("HH:mm:ss"));
+            $('#s-cur-time').html(moment(time).format("HH:mm:ss"));
+        } else {
+            $('#s-nul-time').html("-01:00");
+            $('#s-total-time').html(formatGameTimeMS(te-ts));
+            $('#s-cur-time').html(formatGameTimeMS(time - ts));
+        }
+    }
+
 
 
 }
@@ -611,7 +689,7 @@ var Track = function (strack) {
                 case '$': that.startPoint = new google.maps.LatLng(lat, lng); that.markers.push(that.startPoint); break;
                 case '@': that.markers.push(new google.maps.LatLng(lat, lng)); break;
                 case '#':
-                    if (!time > 0 /*|| time-oldTime<minDelta*/) return;
+                    if (!time > 0 || (oldTime && time-oldTime<60000)) return;
                     if (that.ts == 0)that.ts = time;
                     oldTime = time;
 
@@ -678,6 +756,7 @@ var Track = function (strack) {
         }
         return null;
     };
+
 
 };
 
@@ -785,3 +864,24 @@ function formatGameTimeMS(timeMS, onlyMinutes) {
         return str;
     }
 }
+
+
+var users = {};
+users[89001] = {
+    color: "FF00FF",
+    track: [
+        "#43.3519333333333,16.2370866666667,07.05.2014,14:14:01",
+        "#43.3669366666667,16.2242933333333,07.05.2014,14:22:59",
+        "#43.3787683333333,16.2117883333333,07.05.2014,14:30:52",
+        "#43.3818316666667,16.204175,07.05.2014,14:45:16"
+    ]
+};
+
+users[89002] = {
+    color: "CC0ACC",
+    track: [
+        "#43.33066155,16.21618618,07.05.2014,14:16:26",
+        "#43.34439806,16.22380885,07.05.2014,14:25:54",
+        "#43.3699966,16.22065416,07.05.2014,14:42:33"
+    ]
+};

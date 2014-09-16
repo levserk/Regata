@@ -86,7 +86,7 @@ html, body, #map-canvas {
 
 #s-nul-time{
     float: left;
-    width: 50px;
+    width: 62px;
 }
 #s-cur-time{
     display: block;
@@ -137,7 +137,7 @@ html, body, #map-canvas {
     margin-right: 5px;
 }
 #angle {
-    font-size: 8pt;
+    font-size: 10px;
     text-align: center;
     height: 31px;
     width: 88px;
@@ -209,7 +209,7 @@ html, body, #map-canvas {
     height:7px;
     border-radius: 15px;
     float: left;
-    margin-right: 10px;
+    margin-right: 0px;
     margin-top: 5px;
 }
 #bt-follow{
@@ -236,18 +236,26 @@ body.front_page{
 }
 
 body.front_page div.wrap{
-	width:770px;
+	width:70%;
+	min-height:600px;
 	margin:0 auto;
 	border: 1px solid #CCC;
 	background:white;
 	margin-top: 15px;
 }
 
-body.front_page div.wrap .on-line{
+body.front_page div.wrap.box_on-line{
+	display:table;
 	width:100%;
-	height:450px;
+}
+
+body.front_page div.wrap .on-line{
+	width:1%;
+	height:650px;
 	overflow:hidden;
 	text-align:center;
+	display:table-cell;	
+	vertical-align:middle;
 }
 
 h1.front{
@@ -370,7 +378,7 @@ table.regata_main_table tr td.no-right-border{
 
 .bottom_area{
 	position:relative;
-	width:770px;
+	width:70%;
 	min-height:300px;
 	overflow-x:hidden;
 	margin:5px auto 0 auto;
@@ -444,6 +452,13 @@ table.regata_list tr td{
 	top: 6px;
 	right: 6px;
 	cursor:pointer;
+}
+
+.history_box li{
+	cursor:pointer;
+	list-style-type: none;
+	padding:10px 0;
+	text-decoration:underline;
 }
 
 
