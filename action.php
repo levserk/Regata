@@ -1,5 +1,6 @@
 <?php 
 require_once('./Classes/Db.php');
+require_once('./Classes/ChromePhp.php');
 Db::connect('localhost', 'monitor', '12345678', 'races');
 
 class action{
@@ -58,10 +59,13 @@ class action{
 	
 	
 	public function HistoryGetDays(){
-		 Db::query("SELECT DISTINCT(DATE_FORMAT(FROM_UNIXTIME(dt/1000),'%e')) as d, DATE_FORMAT(FROM_UNIXTIME(dt/1000),'%d.%m.%y') as days, DATE_FORMAT(FROM_UNIXTIME(dt/1000),'%M') as m, DATE_FORMAT(FROM_UNIXTIME(dt/1000),'%Y') as y FROM tracks");
-		 $tmp='<ul class="history_box">';
+        $query = "SELECT SQL_CACHE FROM_UNIXTIME(dt,'%e') as d, FROM_UNIXTIME(dt,'%d.%m.%y') as days, FROM_UNIXTIME(dt,'%M') as m, FROM_UNIXTIME(dt,'%Y') as y, dt
+                    FROM (SELECT DISTINCT UNIX_TIMESTAMP(FROM_UNIXTIME(dt*0.001,'%Y-%m-%d')) dt FROM tracks ) t";
+        ChromePhp::log($query);
+        Db::query($query);
+        $tmp='<ul class="history_box">';
          while ($Res=mysqli_fetch_array(Db::$result)){			
-			$tmp.='<li id="'.$Res['days'].'" class="tracksForDate">'.$Res['d'].' '.$this->DateConvert($Res['m']).' '.$Res['y'].'</li>';
+			$tmp.='<li id="'.$Res['dt'].'" class="tracksForDate">'.$Res['d'].' '.$this->DateConvert($Res['m']).' '.$Res['y'].'</li>';
 		 }
 		 $tmp.='</ul>';
 		 return $tmp;
@@ -70,12 +74,14 @@ class action{
 	
 	
 	public function TracksDate($m_data){
-		Db::query("SELECT user_id, imei, name, DATE_FORMAT(FROM_UNIXTIME(dt/1000),'%d.%m.%y') as days,lat,lon,color,DATE_FORMAT(FROM_UNIXTIME(dt/1000),'%H:%i:%s') as time
-				   FROM tracks 
-				   INNER JOIN users 
+        $query = "SELECT user_id, imei, name, DATE_FORMAT(FROM_UNIXTIME(dt/1000),'%d.%m.%y') as days,lat,lon,color,DATE_FORMAT(FROM_UNIXTIME(dt/1000),'%H:%i:%s') as time
+				   FROM tracks
+				   INNER JOIN users
 		           ON tracks.user_id=users.id
-				   WHERE DATE_FORMAT(FROM_UNIXTIME(dt/1000),'%d.%m.%y')='".$m_data['day']."'
-		           ORDER BY tracks.dt ASC");
+				   WHERE dt between ".($m_data['day']*1000)." and ".($m_data['day']*1000+24*60*60*1000)."
+		           ORDER BY tracks.dt ASC";
+        ChromePhp::log($query);
+		Db::query($query);
 		while ($Res=mysqli_fetch_array(Db::$result)){	
 			$imei[$Res['name']]=$Res['name'];
 			$user[$Res['name']]['cord'][]='#'.$Res['lat'].','.$Res['lon'].','.$Res['days'].','.$Res['time'];		
