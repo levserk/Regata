@@ -452,5 +452,67 @@ var races = {
                 delta: 0
             }
         ]
+    },
+	'19': {
+        title:'Тренировка <br>14 сентября 2014',
+        angle:220,
+        stracks: [
+            {
+                url: 'races/2014-09-14/14.dat',
+                lab: '14 Андреев 49',
+                timezone: '00:00',
+                color: '#330066',
+                position: 1
+            }
+        ]
+    },
+    '20': {
+        title:'Гонка 1 <br>15 сентября 2014',
+        angle:220,
+        stracks: [
+            {
+                url: 'races/2014-09-15/14.dat',
+                lab: '14 Андреев 49',
+                timezone: '00:00',
+                color: '#330066',
+                position: 0
+            },
+            {
+                url: 'races/2014-09-15/16.dat',
+                lab: '16 Пинхасик 43',
+                timezone: '00:00',
+                color: '#000000',
+                position: 0
+            },
+            {
+                url: 'races/2014-09-15/18.dat',
+                lab: '18 Поляновский 48',
+                timezone: '00:00',
+                color: '#0099CC',
+                position: 0
+            },
+            {
+                url: 'races/2014-09-15/20.dat',
+                lab: '20 Тузлуков 45',
+                timezone: '00:00',
+                color: '#FF0000',
+                position: 0
+            },
+            {
+                url: 'races/2014-09-15/24.dat',
+                lab: '24 Трусов 47',
+                timezone: '00:00',
+                color: '#FFFFFF',
+                position: 0
+            },
+            {
+                url: 'races/2014-09-15/25.dat',
+                lab: '25 Самойлов 40',
+                timezone: '00:00',
+                color: '#669999',
+                position: 0
+            }
+        ]
     }
+	
 };

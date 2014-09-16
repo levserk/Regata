@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <title>Регата</title>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+
+    <script src="js/moment-with-langs.min.js"></script>
+    <script src="js/underscore-min.js"></script>
+    <script src="js/races.js"></script>
+    <script src="js/regataOSM.js"></script>
+    <script src="js/osm.js"></script>
+
+
+
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
+
+</head>
+<body>
+<div class="button" onclick="loadTrack(11)">Тиурула 1</div>
+<div class="button" onclick="loadTrack(12)">Тиурула 2</div>
+<div class="button" onclick="loadTrack(13)">Тиурула 28.06</div>
+<div class="button" onclick="loadTrack(14)">Тиурула 29.06</div>
+<div class="button" onclick="loadTrack(15)">Тиурула 12.07</div>
+<div class="button" onclick="loadTrack(16)">Шхеры 12.07</div>
+<div class="button" onclick="loadTrack(17)">Тиурула 13.07</div>
+<div class="button" onclick="loadTrack(18)">Тиурула 22.07</div>
+
+<div id="google-map">
+    <div id="map-canvas"></div>
+</div>
+
+<div style="width: 900px; margin: 0 auto">
+    <div id ="player-panel">
+        <span id="s-title">
+            Title
+        </span>
+        <div id="player-table">
+            players
+        </div>
+    </div>
+ </div>
+ <div id="panel">
+             <div style="width:1200px; margin: 0 auto">
+                 <div id="middle-top-pan">
+                     <span id="s-nul-time">-01:00</span>
+                     <input id="bar" type="range" min="0" max="100000" value="0" />
+                     <span id="s-total-time">&nbsp;</span>
+                     <span id="s-cur-time">&nbsp;</span>
+                 </div>
+                 <div id="middle-pan">
+                     <div id="speed">
+                         <button class="bt-speed" id="bt-down">-</button>
+                               <span id="s-speed" style = " display: block;
+                                                            float: left;
+                                                            width: 41px; margin-top: 2px">x50</span>
+                         <button class="bt-speed" id="bt-up">+</button>
+                     </div>
+                     <div id="control-panel">
+                        <div class="pl-button" id="bt-prev"></div>
+                        <div class="pl-button" id="bt-play"></div>
+                        <div class="pl-button" id="bt-next"></div>
+                     </div>
+                     <div id="angle">
+                         <button class="bt-speed" id="bt-left"></button>
+                               <span id="s-angle" style = " display: block;
+                                                            float: left;
+                                                            width: 47px; margin-top: 2px">-1° &nbsp; &nbsp; +1°</span>
+                         <button class="bt-speed" id="bt-right"></button>
+                     </div>
+                     <button class="bt-speed" id="bt-follow">следовать</button>
+                 </div>
+
+                 <div id="info"></div>
+             </div>
+</div>
+</body></html>
