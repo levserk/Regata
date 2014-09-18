@@ -72,6 +72,44 @@ function loadTracks(data){
 }
 
 
+function loadHistory(timeStart, timeEnd){
+    $.ajax({
+        type: "POST",
+        url: 'action.php',
+        data:{type:'getRegataMembers',data:{timeStart:timeStart, timeEnd:timeEnd}},
+        success: function(data) {
+            var race = {}; race.stracks=[];
+            data = JSON.parse(data);
+            var st = new Date();
+            for (var imei in data){
+                $.ajax({
+                    type: "POST",
+                    url: 'action.php',
+                    async:false,
+                    data:{type:'getRegataTrack',data:{user_id:data[imei].user_id, timeStart:timeStart, timeEnd: timeEnd, approximate:true}},
+                    success: function(strack) {
+                        var spoints = strack.split('\r\n');
+                        race.stracks.push({
+                            lab : data[imei].lab,
+                            imei:imei,
+                            color: "#"+data[imei].color,
+                            user_id: data[imei].user_id,
+                            spoints : spoints
+                        });
+                        console.log('track ', data[imei], 'points:',  spoints.length);
+                    }
+                });
+            }
+            console.log('time: ', new Date() - st);
+            $("#map-canvas").show();
+            $(".button").hide();
+            regata = new Regata(race);
+            regata.setShowRealTime(true);
+        }
+    })
+}
+
+
 function Regata(_race) {
     var tracks;
     var minLat, maxLat, minLng, maxLng,  center, ts, te, deltaTime, timePerSec = 40, time;
@@ -321,7 +359,6 @@ function Regata(_race) {
         if (z<=16) { setMarkersRadius(9);  setBoardsRadius(3); }
         if (z==17) { setMarkersRadius(6);  setBoardsRadius(5); }
         if (z >17) { setMarkersRadius(5);  setBoardsRadius(9);}
-        console.log(map.getZoom());
     }
 
     function setBoardsRadius(r){
@@ -677,11 +714,12 @@ var Track = function (strack) {
         var spoint, point, prev, time, oldTime = 0, lat, lng;
         spoints.forEach(function (element, index, list) {
             spoint = element.split(',');
-            if (spoint.length < 4) return;
+            if (spoint.length < 3) return;
             var type = spoint[0].substring(0,1); spoint[0] = spoint[0].substring(1);
             lat = parseFloat(spoint[0]);
             lng = parseFloat(spoint[1]);
-            time = moment(spoint[2] + ' ' + spoint[3].replace(/\n|\r/g, ""), "DD.MM.YYYY HH:mm:ss").valueOf();
+            if (!isNaN(parseInt(spoint[2]))) time = parseInt(spoint[2]);
+            else time = moment(spoint[2] + ' ' + spoint[3].replace(/\n|\r/g, ""), "DD.MM.YYYY HH:mm:ss").valueOf();
             time += that.delta*1000;
             switch (type) {
                 case '!': that.startTime = time; break;
@@ -689,7 +727,7 @@ var Track = function (strack) {
                 case '$': that.startPoint = new google.maps.LatLng(lat, lng); that.markers.push(that.startPoint); break;
                 case '@': that.markers.push(new google.maps.LatLng(lat, lng)); break;
                 case '#':
-                    if (!time > 0 || (oldTime && time-oldTime<60000)) return;
+                    if (!time > 0 || (oldTime && time-oldTime<5000)) return;
                     if (that.ts == 0)that.ts = time;
                     oldTime = time;
 

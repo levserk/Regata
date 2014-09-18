@@ -6,7 +6,7 @@ $(document).ready(function(){
 		
 		this.showTable=function(id){
 			$('.table-regata').addClass('hide');
-			/*заглушка*/
+			/*пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ*/
 			$('.no-info').addClass('hide');
 			$('#r'+id).removeClass('hide');
 			$('.bottom_area').addClass('hide');
@@ -16,32 +16,20 @@ $(document).ready(function(){
 		
 		this.getHostory=function(){
 			var data={};
-			$.ajax({
-				type: "POST",
-				url: 'action.php',
-				cache:false,
-				data:{type:'HistoryGetDays',data:data},
-				success: function(data) {
-					$('.on-line').html(data);
-					
-					$('.tracksForDate').bind('click', function(){
-						var data={};
-						data['day']=$(this).attr('id');
-						$.ajax({
-							type: "POST",
-							url: 'action.php',
-							cache:false,
-							data:{type:'TracksDate',data:data},
-							success: function(data) {
-								loadTracks($.parseJSON(data));
-								$('.wrap').hide();	
-								$('#btn_back').show();
-							}
-						})	
-					});
-					
-				}
-			})		
+            $.ajax({
+                type: "POST",
+                url: 'action.php',
+                cache:false,
+                data:{type:'HistoryGetDays',data:data},
+                success: function(data) {
+                    $('.on-line').html(data);
+                    $('.tracksForDate').bind('click', function(){
+                        loadHistory($(this).attr('id'),parseInt($(this).attr('id'))+24*60*60);
+                        $('.wrap').hide();
+                        $('#btn_back').show();
+                    });
+                }
+            })
 		}
 		
 		this.getListRaces=function(id){
@@ -105,7 +93,7 @@ $(document).ready(function(){
 	
 	
 	var Init=new Front(); 
-	 //выбор цвета
+	 //пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
     function ColorSelect(){
 
         this.themes=[];

@@ -74,21 +74,26 @@ class action{
 	
 	
 	public function TracksDate($m_data){
-        $query = "SELECT user_id, imei, name, DATE_FORMAT(FROM_UNIXTIME(dt/1000),'%d.%m.%y') as days,lat,lon,color,DATE_FORMAT(FROM_UNIXTIME(dt/1000),'%H:%i:%s') as time
+        $query = "SELECT user_id, imei, name, DATE_FORMAT(FROM_UNIXTIME(dt/1000),'%d.%m.%y') as days,lat,lon,color,DATE_FORMAT(FROM_UNIXTIME(dt/1000),'%H:%i:%s') as time, dt
 				   FROM tracks
 				   INNER JOIN users
 		           ON tracks.user_id=users.id
-				   WHERE dt between ".($m_data['day']*1000)." and ".($m_data['day']*1000+24*60*60*1000)."
+				   WHERE dt between ".($m_data['day']*1000)." and ".($m_data['day']*1000+6*60*60*1000)."
 		           ORDER BY tracks.dt ASC";
         ChromePhp::log($query);
 		Db::query($query);
-		while ($Res=mysqli_fetch_array(Db::$result)){	
-			$imei[$Res['name']]=$Res['name'];
-			$user[$Res['name']]['cord'][]='#'.$Res['lat'].','.$Res['lon'].','.$Res['days'].','.$Res['time'];		
-			$user[$Res['name']]['color']=$Res['color'];
-			$user[$Res['name']]['user_id']=$Res['user_id'];
+        $prevtime = 0;
+		while ($Res=mysqli_fetch_array(Db::$result)){
+            //ChromePhp::log($Res['time'], $Res['time'] - $prevtime);
+            if ($Res['dt'] - $prevtime > 10000){
+                $prevtime = $Res['dt'];
+                $imei[$Res['name']]=$Res['name'];
+                $user[$Res['name']]['cord'][]='#'.$Res['lat'].','.$Res['lon'].','.$Res['days'].','.$Res['time'];
+                $user[$Res['name']]['color']=$Res['color'];
+                $user[$Res['name']]['user_id']=$Res['user_id'];
+            }
 		}
-		
+
 		foreach ($imei as $key => $value) {
 			$tmp[$key]=array(
 				'color'=>$user[$key]['color'],
@@ -98,6 +103,71 @@ class action{
 		}
 		return json_encode($tmp);
 	}
+
+
+    public function getRegataMembers($data){
+        $timeStart = $data['timeStart']* 1000;
+        $timeEnd = $data['timeEnd']* 1000;
+        if (!is_numeric($timeStart)||!is_numeric($timeEnd)) return null;
+        $query = "SELECT id, imei, name, color
+                    FROM  users
+                    WHERE exists(select 1 from tracks
+                    where user_id=users.id and dt between $timeStart and $timeEnd)";
+        ChromePhp::log($query);
+        Db::query($query);
+        while ($Res=mysqli_fetch_array(Db::$result)){
+            $tmp[$Res['imei']]=array(
+                'color'=>$Res['color'],
+                'lab'=>$Res['name'],
+                'user_id'=>$Res['id']
+            );
+        }
+        return json_encode($tmp);
+    }
+
+
+    public function getRegataTrack($data){
+        $timeStart = $data['timeStart']* 1000;
+        $timeEnd = $data['timeEnd']* 1000;
+        $id = $data['user_id'];
+        if (isset($data['approximate']) && $data['approximate']=="false") $apr = false; else $apr = true;
+        $approxiTime = 2000;
+        $approxiDistance = 0.0001;
+        if (!is_numeric($timeStart)||!is_numeric($timeEnd)||!is_numeric($id)) return null;
+        $result='';
+        $prev = null;
+        $query = "SELECT lat,lon, dt,
+                    FROM_UNIXTIME(dt/1000,'%d.%m.%y') as day,
+                    FROM_UNIXTIME(dt/1000,'%H:%i:%s') as time
+                    FROM tracks  WHERE user_id = $id and dt between $timeStart and $timeEnd ORDER BY tracks.dt ASC";
+        ChromePhp::log($query);
+        Db::query($query);
+        while ($Res=mysqli_fetch_array(Db::$result)){
+            if(!$apr || $prev==null || ($apr && $this->approximateTrackPoints($prev, $Res, $approxiTime, $approxiDistance))){
+                if ($prev!=null)$result.='#'.$prev['lat'].','.$prev['lon'].','.$prev['dt']."\r\n";
+                if (isset($prev['dtEnd'])) $result.='#'.$prev['lat'].','.$prev['lon'].','.$prev['dtEnd']."\r\n";
+                $prev = $Res;
+            }
+        }
+        if ($prev!=null)  {
+            $result.='#'.$prev['lat'].','.$prev['lon'].','.$prev['dt'];
+            if (isset($prev['dtEnd'])) $result.="\r\n".'#'.$prev['lat'].','.$prev['lon'].','.$prev['dtEnd'];
+        }
+        return $result;
+    }
+
+
+    private function approximateTrackPoints($prev, $point, $approxiTime, $approxiDistance){
+        if ($point['dt'] - $prev['dt'] < $approxiTime) return false;
+        else {
+            //$dist = sqrt(($point['lat']-$prev['lat'])*($point['lat']-$prev['lat']) + ($point['lon']-$prev['lon'])*($point['lon']-$prev['lon']));
+            if ($point['lat']==$prev['lat'] && $point['lon']==$prev['lon']){
+                $prev['dtEnd'] = $point['dt'];
+                return false;
+            }
+            else return true;
+        }
+    }
 	
 	
 	public function RaceList(){
