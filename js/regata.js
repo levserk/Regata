@@ -78,33 +78,36 @@ function loadHistory(timeStart, timeEnd){
         url: 'action.php',
         data:{type:'getRegataMembers',data:{timeStart:timeStart, timeEnd:timeEnd}},
         success: function(data) {
-            var race = {}; race.stracks=[];
+            var race = { stracks : [] };
             data = JSON.parse(data);
-            var st = new Date();
-            for (var imei in data){
-                $.ajax({
-                    type: "POST",
-                    url: 'action.php',
-                    async:false,
-                    data:{type:'getRegataTrack',data:{user_id:data[imei].user_id, timeStart:timeStart, timeEnd: timeEnd, approximate:true}},
-                    success: function(strack) {
-                        var spoints = strack.split('\r\n');
-                        race.stracks.push({
-                            lab : data[imei].lab,
-                            imei:imei,
-                            color: "#"+data[imei].color,
-                            user_id: data[imei].user_id,
-                            spoints : spoints
-                        });
-                        console.log('track ', data[imei], 'points:',  spoints.length);
-                    }
-                });
-            }
-            console.log('time: ', new Date() - st);
             $("#map-canvas").show();
             $(".button").hide();
             regata = new Regata(race);
             regata.setShowRealTime(true);
+            for (var imei in data){
+                var element  = data[imei];
+                element.loadMe = function(){
+                    var self = this;
+                    $.ajax({
+                        type: "POST",
+                        url: 'action.php',
+                        data:{type:'getRegataTrack',data:{user_id:self.user_id, timeStart:timeStart, timeEnd: timeEnd, approximate:true}},
+                        success: function(strack) {
+                            var spoints = strack.split('\r\n');
+                            regata.addTrack({
+                                lab : self.lab,
+                                imei:self.imei,
+                                color: "#"+self.color,
+                                user_id: self.user_id,
+                                spoints : spoints
+                            });
+                            console.log('track ', element, 'points:',  spoints.length);
+                        }
+                    });
+                };
+                element.loadMe();
+            }
+
         }
     })
 }
@@ -119,10 +122,12 @@ function Regata(_race) {
     var refereePoint, startPoint, markers;
     var overlay = new google.maps.OverlayView();
     var self = this;
+    var regataRace = _race;
 
     init(_race);
 
     function init(race) {
+        regataRace = race;
         var track;
         tracks = [];
 
@@ -186,10 +191,11 @@ function Regata(_race) {
                     }
                 ],
                 strokeColor: track.color,
-                strokeOpacity: 1.0,
+                strokeOpacity: 0,
                 strokeWeight: 0.45,
                 map: map
             });
+            track.drawPolylines(map);
         });
 
         overlay.draw = function() {};
@@ -205,11 +211,33 @@ function Regata(_race) {
         $('#s-speed').html('x' + timePerSec);
         $('#player-panel').show();
 
-        showPlayers(_race);
+        showPlayers(regataRace);
 
         time = ts;
         //zoomMap(16);
     }
+
+    this.addTrack = function(strack){
+        regataRace.stracks.push(strack);
+        var track = new Track(strack);
+        tracks.push(track);
+        track.line = new google.maps.Polyline({
+            path: track.coords,
+            icons: [
+                {
+                    icon: track.marker,
+                    offset: '0%'
+                }
+            ],
+            strokeColor: track.color,
+            strokeOpacity: 0,
+            strokeWeight: 0.45,
+            map: map
+        });
+        track.drawPolylines(map);
+        updateTimeLabels();
+        showPlayers(regataRace);
+    };
 
     function play() {
         if ((!time || time == te) && !frewind) time = ts;
@@ -387,31 +415,31 @@ function Regata(_race) {
             phtml += "<div style='width: 100%; height: 20px;'>";	
 			phtml += '<input style="float:left;margin-right:5px" class="showPlayer" id="'+index+'" type="checkbox" checked>';
             phtml += '<div class="circle" style="border: 2px solid ' + track.color + '; background:' + track.color + '">&nbsp;</div>';			
-            phtml += '&nbsp;' + track.lab ;//+ " &nbsp;&nbsp;(" + track.position + " место)";
+            phtml += '&nbsp;' + track.lab + (!!track.position?" &nbsp;&nbsp;(" + track.position + " место)":"");
             phtml += "</div>";
         });
 		//phtml +='<button style="width:100px;margin-top:10px" class="bt-speed" id="hide_all_Players">скрыть всех</button>';
         $('#player-table').html(phtml);
+
+        $('.showPlayer').change(function(){
+            var id=$(this).attr('id');
+            if($(this).prop("checked")==false){
+                regata.hideTrack(id);
+            } else{
+                regata.showTrack(id);
+            }
+        });
+
+        $('#hide_all_Players').click(function(){
+            console.log(race.stracks);
+            $('.showPlayer').each(function(){
+                var id=$(this).attr('id');
+                $(this).removeAttr('checked');
+                regata.hideTrack(id);
+            });
+        });
     }
 	
-	$('#hide_all_Players').click(function(){
-		console.log(race.stracks);
-		$('.showPlayer').each(function(){
-			var id=$(this).attr('id');
-			$(this).removeAttr('checked');
-			regata.hideTrack(id);
-		});	
-	});
-	
-	$('.showPlayer').change(function(){
-		var id=$(this).attr('id');
-		if($(this).prop("checked")==false){
-			regata.hideTrack(id);
-		} else{
-			regata.showTrack(id);
-		}
-	});
-
     function rotate(_angle){
         angle = _angle;
         if (angle>360)angle=0;
@@ -588,19 +616,19 @@ function Regata(_race) {
 
     this.showTrack = function(id){
         if (id != 0 && !id) {
-            for (var i=0; i< tracks.length; i++) { tracks[i].line.setVisible(true); }
+            for (var i=0; i< tracks.length; i++) { tracks[i].setVisible(true); }
             return;
         }
         var track = tracks[id];
         if (!track) return;
-        track.line.setVisible(true);
+        track.setVisible(true);
         updateTimeLabels();
     };
 
     this.hideTrack = function(id){
         var track = tracks[id];
         if (!track) return;
-        track.line.setVisible(false);
+        track.setVisible(false);
         updateTimeLabels();
     };
 
@@ -639,7 +667,8 @@ function Regata(_race) {
            }
         });
         map.setCenter(new google.maps.LatLng(minLat + (maxLat - minLat) * 0.5, minLng + (maxLng - minLng) * 0.5));
-        time = ts;
+        if (time < ts) time = ts;
+        if (time > te) time = te;
         $('#bar').attr('max', te);
         $('#bar').attr('min', ts);
         $('#bar').val(time);
@@ -718,7 +747,7 @@ var Track = function (strack) {
             var type = spoint[0].substring(0,1); spoint[0] = spoint[0].substring(1);
             lat = parseFloat(spoint[0]);
             lng = parseFloat(spoint[1]);
-            if (!isNaN(parseInt(spoint[2]))) time = parseInt(spoint[2]);
+            if (!isNaN(parseInt(spoint[2])) && spoint[2].indexOf('.') == -1) time = parseInt(spoint[2]);
             else time = moment(spoint[2] + ' ' + spoint[3].replace(/\n|\r/g, ""), "DD.MM.YYYY HH:mm:ss").valueOf();
             time += that.delta*1000;
             switch (type) {
@@ -727,7 +756,7 @@ var Track = function (strack) {
                 case '$': that.startPoint = new google.maps.LatLng(lat, lng); that.markers.push(that.startPoint); break;
                 case '@': that.markers.push(new google.maps.LatLng(lat, lng)); break;
                 case '#':
-                    if (!time > 0 || (oldTime && time-oldTime<5000)) return;
+                    if (!time > 0 || (oldTime && time-oldTime<500)) return;
                     if (that.ts == 0)that.ts = time;
                     oldTime = time;
 
@@ -768,7 +797,8 @@ var Track = function (strack) {
                 return point.totalDistance;
             } else
             if (time >= point.time && that.points[i + 1].time > time) {
-                return point.totalDistance + (time - point.time) / (that.points[i + 1].time - point.time) * that.points[i + 1].distance;
+                if (that.points[i + 1].time - point.time > 60000) return point.totalDistance;
+                else return point.totalDistance + (time - point.time) / (that.points[i + 1].time - point.time) * that.points[i + 1].distance;
             }
         }
         return 0;
@@ -793,6 +823,32 @@ var Track = function (strack) {
             }
         }
         return null;
+    };
+
+    this.drawPolylines = function(map){
+        var point=null, poly,  prev=null, i = 0; that.polylines = [];
+        while (i<that.points.length){
+            point = that.points[i];
+            if (prev == null || (point.time - prev.time > 60000)){
+                poly = new google.maps.Polyline({
+                    strokeColor: that.color,
+                    strokeOpacity: 1.0,
+                    strokeWeight: 0.45,
+                    map: map
+                });
+                that.polylines.push(poly);
+            }
+            poly.getPath().push(point.LatLng);
+            prev = point;
+            i++;
+        }
+    };
+
+    this.setVisible = function(f){
+        this.line.setVisible(f);
+        for (var i = 0; i < this.polylines.length; i++){
+            this.polylines[i].setVisible(f);
+        }
     };
 
 
