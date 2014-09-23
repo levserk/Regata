@@ -78,7 +78,7 @@ function loadHistory(timeStart, timeEnd){
         url: 'action.php',
         data:{type:'getRegataMembers',data:{timeStart:timeStart, timeEnd:timeEnd}},
         success: function(data) {
-            var race = { stracks : [] };
+            var race = {  stracks : [] };
             data = JSON.parse(data);
             $("#map-canvas").show();
             $(".button").hide();
@@ -112,8 +112,49 @@ function loadHistory(timeStart, timeEnd){
     })
 }
 
+function showOnline(){
+    var timeEnd = Math.floor((new Date()).valueOf()/1000);
+    var timeStart = timeEnd - 5*60;
+    $.ajax({
+        type: "POST",
+        url: 'action.php',
+        data:{type:'getRegataMembers',data:{timeStart:timeStart, timeEnd:timeEnd}},
+        success: function(data) {
+            var race = {title:"онлайн", stracks : [] };
+            data = JSON.parse(data);
+            regata = new Regata(race, "online");
+            regata.setShowRealTime(true);
+            $('#panel').hide();
+            for (var imei in data){
+                var element  = data[imei];
+                element.loadMe = function(){
+                    var self = this;
+                    $.ajax({
+                        type: "POST",
+                        url: 'action.php',
+                        data:{type:'getRegataTrack',data:{user_id:self.user_id, timeStart:timeStart, timeEnd: timeEnd, approximate:true}},
+                        success: function(strack) {
+                            var spoints = strack.split('\r\n');
+                            regata.addTrack({
+                                lab : self.lab,
+                                imei:self.imei,
+                                color: "#"+self.color,
+                                user_id: self.user_id,
+                                spoints : spoints
+                            });
+                            console.log('track ', element, 'points:',  spoints.length);
+                        }
+                    });
+                };
+                element.loadMe();
+            }
+        }
+    })
+}
 
-function Regata(_race) {
+
+function Regata(_race, div) {
+    div = div || "map-canvas";
     var tracks;
     var minLat, maxLat, minLng, maxLng,  center, ts, te, deltaTime, timePerSec = 40, time;
     var playInterval, speedInterval, rotateInterval, fplaying=false, frewind=false, floaded=false, fzoom=false, fdrag=false;
@@ -146,7 +187,7 @@ function Regata(_race) {
         });
 
         mapOptions.center = new google.maps.LatLng(minLat + (maxLat - minLat) * 0.5, minLng + (maxLng - minLng) * 0.5);
-        map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+        map = new google.maps.Map(document.getElementById(div), mapOptions);
         if (race.markers) markers = race.markers;
 
         // draw markers

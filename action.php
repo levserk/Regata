@@ -168,6 +168,15 @@ class action{
             else return true;
         }
     }
+
+
+    public function loadEvent($id){
+        if (!is_numeric($id)) return;
+        Db::query('select race from races where id = '.$id);
+        while ($Res=mysqli_fetch_array(Db::$result)){
+
+        }
+    }
 	
 	
 	public function RaceList(){

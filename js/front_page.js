@@ -23,6 +23,7 @@ $(document).ready(function(){
                 data:{type:'HistoryGetDays',data:data},
                 success: function(data) {
                     $('.on-line').html(data);
+                    $('#player-panel').hide();
                     $('.tracksForDate').bind('click', function(){
                         loadHistory($(this).attr('id'),parseInt($(this).attr('id'))+24*60*60);
                         $('.wrap').hide();
@@ -41,7 +42,7 @@ $(document).ready(function(){
 				data:{type:'get_r'+id,data:data},
 				success: function(data) {				
 					$('.on-line').html(data);
-					
+                    $('#player-panel').hide();
 					$('div.table-regata .show').bind('click', function(){	
 						$('.wrap').hide();	
 						$('#btn_back').show();
@@ -60,7 +61,7 @@ $(document).ready(function(){
 				data:{type:'RaceList',data:data},
 				success: function(data) {
 					$('.on-line').html(data);
-					
+                    $('#player-panel').hide();
 					$('.regata_list tr').bind('click', function(){	
 						that.getListRaces($(this).attr('id'));
 					});	
@@ -137,4 +138,6 @@ $(document).ready(function(){
     }
     var Color=new ColorSelect;
     Color.AppendToBody($('.front_page'),$('.front_page'));
+
+    showOnline();
 });
