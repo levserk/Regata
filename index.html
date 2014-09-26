@@ -7,6 +7,10 @@
     <meta charset="utf-8">
     <title>Регаты</title>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+	
+	<link rel="stylesheet" type="text/css" href="js/jquery-ui/jquery-ui.min.css" />
+	<script src="js/jquery-ui/jquery-ui.js"></script>
+	
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
 
     <script src="js/moment-with-langs.min.js"></script>
@@ -22,7 +26,7 @@
 
 		<div class="box_on-line">
 			<div class="on-line">
-                <div id="online" style="width:900px; height:800px"></div>
+                <div id="online" style="width:100%; height:100%"></div>
 			</div>
 		</div>
 		
@@ -30,7 +34,7 @@
 		<div class="bottom-panel">
 			<button class="top-button">Параметры</button>
 			<button class="top-button" id="history">История</button>			
-			<button class="top-button">Гонки</button>
+			<button class="top-button" id="ready_races">Гонки</button>
 			<button class="top-button" id="race">Мероприятия</button>
 		</div>
 	</div>
@@ -106,6 +110,7 @@
                                                             width: 47px; margin-top: 2px">-1°  +1°</span>
                          <button class="bt-speed" id="bt-right"></button>
                      </div>
+					 <button class="bt-speed" id="new_race">новая гонка</button>
                      <button class="bt-speed" id="bt-follow">следовать</button>
                  </div>
 
@@ -113,7 +118,9 @@
              </div>
 </div>
 	
-	
+<div id="dialog" style="display:none">
+
+</div>	
 	
 </body>
 </html>

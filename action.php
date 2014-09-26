@@ -59,8 +59,9 @@ class action{
 	
 	
 	public function HistoryGetDays(){
-        $query = "SELECT SQL_CACHE FROM_UNIXTIME(dt,'%e') as d, FROM_UNIXTIME(dt,'%d.%m.%y') as days, FROM_UNIXTIME(dt,'%M') as m, FROM_UNIXTIME(dt,'%Y') as y, dt
-                    FROM (SELECT DISTINCT UNIX_TIMESTAMP(FROM_UNIXTIME(dt*0.001,'%Y-%m-%d')) dt FROM tracks ) t";
+        $query = "SELECT DATE_FORMAT(dt,'%e') as d, DATE_FORMAT(dt,'%d.%m.%y') as days,
+                    DATE_FORMAT(dt,'%M') as m, DATE_FORMAT(dt,'%Y') as y, UNIX_TIMESTAMP(dt) dt
+                    FROM (SELECT DISTINCT `day` dt FROM tracks ) t";
         ChromePhp::log($query);
         Db::query($query);
         $tmp='<ul class="history_box">';
@@ -109,10 +110,40 @@ class action{
         $timeStart = $data['timeStart']* 1000;
         $timeEnd = $data['timeEnd']* 1000;
         if (!is_numeric($timeStart)||!is_numeric($timeEnd)) return null;
+
+        if ($timeStart == 0) {
+            date_default_timezone_set("UTC");
+            $timeStart =  time()*1000 - (isset($data['delta'])?$data['delta']:5*60)*1000;
+        }
+
+        if ($timeEnd == 0) {
+            $where = " dt > $timeStart ";
+        } else  $where = " dt between $timeStart and $timeEnd ";
+
+        if (isset($data['filterIn']) && count($data['filterIn']) > 0){
+            $where.= " and user_id in (";
+            $isFirst = true;
+            foreach($data['filterIn'] as $val){
+                $where.= ($isFirst?'':', ').$val;
+                $isFirst = false;
+            }
+            $where.= " ) ";
+        }
+
+        if (isset($data['filterNotIn']) && count($data['filterNotIn']) > 0){
+            $where.= " and user_id not in (";
+            $isFirst = true;
+            foreach($data['filterNotIn'] as $val){
+                $where.= ($isFirst?'':', ').$val;
+                $isFirst = false;
+            }
+            $where.= " ) ";
+        }
+
         $query = "SELECT id, imei, name, color
                     FROM  users
                     WHERE exists(select 1 from tracks
-                    where user_id=users.id and dt between $timeStart and $timeEnd)";
+                    where user_id = users.id and $where )";
         ChromePhp::log($query);
         Db::query($query);
         while ($Res=mysqli_fetch_array(Db::$result)){
@@ -133,15 +164,25 @@ class action{
         if (isset($data['approximate']) && $data['approximate']=="false") $apr = false; else $apr = true;
         $approxiTime = 2000;
         $approxiDistance = 0.0001;
-        if (!is_numeric($timeStart)||!is_numeric($timeEnd)||!is_numeric($id)) return null;
         $result='';
         $prev = null;
+        if (!is_numeric($timeStart)||!is_numeric($timeEnd)||!is_numeric($id)) return null;
+
+        if ($timeStart == 0) {
+            date_default_timezone_set("UTC");
+            $timeStart =  time()*1000 - (isset($data['delta'])?$data['delta']:5*60)*1000;
+        }
+
+        if ($timeEnd == 0) $where = " dt > $timeStart ";
+        else $where = " dt between $timeStart and $timeEnd ";
+
         $query = "SELECT lat,lon, dt,
                     FROM_UNIXTIME(dt/1000,'%d.%m.%y') as day,
                     FROM_UNIXTIME(dt/1000,'%H:%i:%s') as time
-                    FROM tracks  WHERE user_id = $id and dt between $timeStart and $timeEnd ORDER BY tracks.dt ASC";
+                    FROM tracks  WHERE user_id = $id and $where ORDER BY tracks.dt ASC";
         ChromePhp::log($query);
         Db::query($query);
+
         while ($Res=mysqli_fetch_array(Db::$result)){
             if(!$apr || $prev==null || ($apr && $this->approximateTrackPoints($prev, $Res, $approxiTime, $approxiDistance))){
                 if ($prev!=null)$result.='#'.$prev['lat'].','.$prev['lon'].','.$prev['dt']."\r\n";
@@ -178,6 +219,36 @@ class action{
         }
     }
 	
+	public function CreateRace($data){
+		$params=serialize($data);
+		$query = "INSERT INTO races_from_history SET number='".$data['number']."',`date`='".$data['date']."', time_start='".$data['time_start']."', time_finish='".$data['time_finish']."', data='".$params."' ";
+        ChromePhp::log($query);
+        ChromePhp::log(Db::query($query), Db::$error);
+	}
+	
+	
+	public function ReadyRaceList(){
+		$tmp='<ul class="history_box">';
+		$query = "SELECT * FROM races_from_history";
+		ChromePhp::log($query);
+        Db::query($query);
+        while ($Res=mysqli_fetch_array(Db::$result)){
+			$tmp.='<li id="'.$Res['id'].'" class="ReadyRace">'.$Res['date'].' ('.$Res['number'].')</li>';
+		}
+		$tmp.='</li>';
+		return $tmp;
+	}
+
+    public function loadRace($id){
+        if (!is_numeric($id)) return null;
+        $query = "SELECT data FROM races_from_history where id = $id";
+        ChromePhp::log($query);
+        Db::query($query);
+        while ($Res=mysqli_fetch_array(Db::$result)){
+            $result = unserialize($Res['data']);
+        }
+        return json_encode($result);
+    }
 	
 	public function RaceList(){
 		return '<div class="race_list_window">

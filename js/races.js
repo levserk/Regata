@@ -454,19 +454,6 @@ var races = {
         ]
     },
 	'19': {
-        title:'Тренировка <br>14 сентября 2014',
-        angle:220,
-        stracks: [
-            {
-                url: 'races/2014-09-14/14.dat',
-                lab: '14 Андреев 49',
-                timezone: '00:00',
-                color: '#330066',
-                position: 1
-            }
-        ]
-    },
-    '20': {
         title:'Гонка 1 <br>15 сентября 2014',
         angle:220,
         stracks: [
@@ -507,6 +494,47 @@ var races = {
             },
             {
                 url: 'races/2014-09-15/25.dat',
+                lab: '25 Самойлов 40',
+                timezone: '00:00',
+                color: '#669999',
+                position: 0
+            }
+        ]
+    },
+    '20': {
+        title:'Гонка 2<br>16 сентября 2014',
+        angle:220,
+        stracks: [
+            {
+                url: 'races/2014-09-16/12.dat',
+                lab: '12 Васинкевич 39',
+                timezone: '00:00',
+                color: '#006699',
+                position: 0
+            },
+            {
+                url: 'races/2014-09-16/18.dat',
+                lab: '18 Поляновский 48',
+                timezone: '00:00',
+                color: '#0099СС',
+                position: 0
+            },
+            {
+                url: 'races/2014-09-16/20.dat',
+                lab: '20 Тузлуков 45',
+                timezone: '00:00',
+                color: '#FFCC99',
+                position: 0
+            },
+            {
+                url: 'races/2014-09-16/21.dat',
+                lab: '18 Dzedziushka 41',
+                timezone: '00:00',
+                color: '#FFCCCC',
+                position: 0
+            },
+            {
+                url: 'races/2014-09-16/25.dat',
                 lab: '25 Самойлов 40',
                 timezone: '00:00',
                 color: '#669999',

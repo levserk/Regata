@@ -5,6 +5,7 @@ class Db
 
 	public static $query;
 	public static $result;
+    public static $error;
 
 	public function __construct ()
 	{
@@ -53,6 +54,7 @@ class Db
 	public static function query($a)
 	{
 		self::$result=mysqli_query(self::$link,$a);
+        self::$error=mysqli_error(self::$link);
 		return mysqli_affected_rows(self::$link);
 	}	
 

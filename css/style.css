@@ -236,7 +236,7 @@ body.front_page{
 }
 
 body.front_page div.wrap{
-	width:70%;
+	width:80%;
 	min-height:600px;
 	margin:0 auto;
 	border: 1px solid #CCC;
@@ -250,7 +250,7 @@ body.front_page div.wrap.box_on-line{
 }
 
 body.front_page div.wrap .on-line{
-	width:1%;
+	width:1500px;
 	height:800px;
 	overflow:hidden;
 	text-align:center;
@@ -460,6 +460,20 @@ table.regata_list tr td{
 	padding:10px 0;
 	text-decoration:underline;
 }
+
+#new_race{
+	position: absolute;
+	top: 7px;
+	left: -100px;
+	width: 80px;
+	height: 24px;
+}
+
+#race_save{
+	margin-top:5px;
+}
+
+
 
 
 

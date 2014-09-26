@@ -1,5 +1,5 @@
 $(document).ready(function(){
-	$.ajaxSetup({ cache: false });
+	$.ajaxSetup({ cache: false, type:"POST", url:'action.php', cache:false});
 	function Front(){	
 	
 		var that=this;	
@@ -17,9 +17,6 @@ $(document).ready(function(){
 		this.getHostory=function(){
 			var data={};
             $.ajax({
-                type: "POST",
-                url: 'action.php',
-                cache:false,
                 data:{type:'HistoryGetDays',data:data},
                 success: function(data) {
                     $('.on-line').html(data);
@@ -36,9 +33,6 @@ $(document).ready(function(){
 		this.getListRaces=function(id){
 			var data={};
 			$.ajax({
-				type: "POST",
-				url: 'action.php',
-				cache:false,
 				data:{type:'get_r'+id,data:data},
 				success: function(data) {				
 					$('.on-line').html(data);
@@ -55,9 +49,6 @@ $(document).ready(function(){
 		this.getRace=function(){
 			var data={};
 			$.ajax({
-				type: "POST",
-				url: 'action.php',
-				cache:false,
 				data:{type:'RaceList',data:data},
 				success: function(data) {
 					$('.on-line').html(data);
@@ -68,6 +59,51 @@ $(document).ready(function(){
 				}
 			})	
 
+		}
+		
+		this.MemberList=function(){	
+			var obj_user_id=regata.getTracks();
+			var user_id=[];
+			$.each(obj_user_id, function( index ){
+				var info={'id':this.id,'label':this.label,'color':this.color};
+				user_id.push(info);
+			});
+			return user_id;
+		}
+		
+		this.CreateMembersCheckbox=function(list){
+			var tmp='';
+			for(var i=0;i<list.length;i++){
+				//console.log(list[i].id);	
+				tmp+='<div style="display:inline-block;margin-right:20px"><input style="" class="MemberMark" id="'+list[i].id+'" type="checkbox" checked="">'+'<div class="circle" style="border: 2px solid '+list[i].color+'; background:'+list[i].color+'">&nbsp;</div>'+list[i].label+'</div>';
+				if(i==8){
+					tmp+='</br>';
+				}
+			}		
+			return tmp;
+		}
+		
+		this.newRace=function(){
+			var fields=[];
+			fields[0]='<div>№ гонки: <input type="text" id="number"></div>';
+			fields[1]='<div>время старта: <input type="text" id="time_start"></div>';
+			fields[2]='<div>время финиша: <input type="text" id="time_finish"></div>';
+			fields[3]='<div>координаты судейской лодки:</br> lat <input type="text" id="judge_cord_lat"> lng <input type="text" id="judge_cord_lng"></div>';
+			fields[4]='<div>координаты стартового буя:</br> lat <input type="text" id="start_buoy_lat"> lng <input type="text" id="start_buoy_lng"></div>';
+			//fields[5]='<div>направление стартового буя: <input type="text" id="direct_buoy"></div>';
+			fields[5]='<div style="margin-top:5px">круговая гонка<input id="no_finish" type="checkbox"></div>';
+			fields[6]='<div>координаты финишного буя:<br> lat <input type="text" id="finish_buoy_lat"> lng <input type="text" id="finish_buoy_lng"></div>';
+			fields[7]='<div>координаты второго финишного буя: </br> lat <input type="text" id="finish_buoy_2_lat"> lng <input type="text" id="finish_buoy_2_lng"></div>';
+			//fields[8]='<div>направление второго финишного буя: <input type="text" id="finish_buoy_direction_2"></div>';
+			fields[8]='<div style="margin-top:10px">'+that.CreateMembersCheckbox(that.MemberList())+'</div>';
+			
+			var form='<div class="new_race_form">';
+			for(var i=0;i<fields.length;i++){
+				form+=fields[i];
+			}
+			form+='<div id="race_save">сохранить</div>';
+			form+='</div>';
+			return form;
 		}
 		
 			
@@ -89,7 +125,94 @@ $(document).ready(function(){
 			$('.bottom_area').addClass('hide');
 			$('.top-button').removeClass('top-button-yellow');	
 		});
-	
+		
+		//вызов окна создания новой гонки
+		$('#new_race').bind('click', function(){
+			$(this).css('background-color', '#FFF6AC');
+			
+			$("#dialog").html(that.newRace());
+			$('#race_save').button()
+			$("#dialog").attr('title','Создание новой гонки');
+			$("#dialog").dialog({width:'auto'});
+			
+			//галочка что финишный буй и стартовый одинаковый
+			$('#no_finish').unbind();
+			$('#no_finish').bind('click', function(){
+				if($(this).prop('checked')==true){
+					$('#finish_buoy_lat').prop('disabled', true);
+					$('#finish_buoy_2_lat').prop('disabled', true);
+					$('#finish_buoy_direction_2_lat').prop('disabled', true);
+					$('#finish_buoy_lng').prop('disabled', true);
+					$('#finish_buoy_2_lng').prop('disabled', true);
+					$('#finish_buoy_direction_2_lng').prop('disabled', true);
+				} else{
+					$('#finish_buoy_lat').prop('disabled', false);
+					$('#finish_buoy_2_lat').prop('disabled', false);
+					$('#finish_buoy_direction_2_lat').prop('disabled', false);
+					$('#finish_buoy_lng').prop('disabled', false);
+					$('#finish_buoy_2_lng').prop('disabled', false);
+					$('#finish_buoy_direction_2_lng').prop('disabled', false);
+				}
+			});
+			
+			//создание новой гонки
+			$('#race_save').unbind();
+			$('#race_save').bind('click', function(){
+				var form_data={};
+				var members=[];
+				//обработка формы
+				$('.new_race_form input').each(function(){
+					var elem=$(this);
+					if(elem.attr('id')=='time_start' || elem.attr('id')=='time_finish'){
+						//время начала и конца
+						form_data[elem.attr('id')]=regata.getTimestamp(elem.val());
+					} else if(elem.attr('type')=='checkbox'){
+						if(elem.prop('checked')==true && elem.attr('class')!='MemberMark'){
+							form_data[elem.attr('id')]='on';	
+						} else{
+							if(elem.attr('class')=='MemberMark' && elem.prop('checked')==false){
+								members.push(elem.attr('id'));
+							} 
+							if(elem.attr('class')!='MemberMark' && elem.prop('checked')==false){
+								form_data[elem.attr('id')]='off';
+							}
+						}
+					} else{
+						form_data[elem.attr('id')]=$(this).val();	
+					}	
+				});
+				form_data['members']=members;
+				if(form_data['no_finish']=='on'){
+					form_data['finish_buoy_lat']=form_data['start_buoy_lat']
+					form_data['finish_buoy_lng']=form_data['start_buoy_lng']
+				}
+				form_data['date']=moment.utc(form_data['time_start']).format('YYYY.MM.DD');
+				console.log(form_data);
+				$.ajax({
+					data:{type:'CreateRace',data:form_data},
+					success: function(data) {
+						$("#dialog").dialog('close');
+					}
+				});
+			});		
+			
+		});	
+		
+		
+		$('#ready_races').bind('click', function(){
+			$('.top-button').removeClass('top-button-yellow');
+			$(this).addClass('top-button-yellow');
+			$.ajax({
+				data:{type:'ReadyRaceList'},
+				success: function(data) {
+					$('.on-line').html(data);
+					 $('#player-panel').hide();
+					$('.ReadyRace').bind('click', function(){
+                        loadRace($(this).attr('id'));
+					});
+				}
+			});
+		});
 	}
 	
 	
