@@ -259,8 +259,8 @@ $(document).ready(function(){
         }
 
     }
-    var Color=new ColorSelect;
-    Color.AppendToBody($('.front_page'),$('.front_page'));
+    //var Color=new ColorSelect;
+    //Color.AppendToBody($('.front_page'),$('.front_page'));
 
     showOnline();
 });

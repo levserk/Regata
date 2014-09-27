@@ -1125,5 +1125,5 @@ function getFilter(def, filter){
     return arr;
 }
 
-var _filterNotIn = [1];
+var _filterNotIn = [];
 var _filterIn;
