@@ -180,7 +180,7 @@ class action{
                     FROM_UNIXTIME(dt/1000,'%d.%m.%y') as day,
                     FROM_UNIXTIME(dt/1000,'%H:%i:%s') as time
                     FROM tracks  WHERE user_id = $id and $where ORDER BY tracks.dt ASC";
-        ChromePhp::log($query);
+        //ChromePhp::log($query);
         Db::query($query);
 
         while ($Res=mysqli_fetch_array(Db::$result)){
@@ -220,7 +220,7 @@ class action{
     }
 	
 	public function CreateRace($data){
-		$params=serialize($data);
+		$params=json_encode($data);
 		$query = "INSERT INTO races_from_history SET number='".$data['number']."',`date`='".$data['date']."', time_start='".$data['time_start']."', time_finish='".$data['time_finish']."', data='".$params."' ";
         ChromePhp::log($query);
         ChromePhp::log(Db::query($query), Db::$error);
@@ -241,13 +241,15 @@ class action{
 
     public function loadRace($id){
         if (!is_numeric($id)) return null;
-        $query = "SELECT data FROM races_from_history where id = $id";
+        $query = "SELECT `data` FROM races_from_history where id = $id";
+        ChromePhp::log("load race", $id);
         ChromePhp::log($query);
         Db::query($query);
         while ($Res=mysqli_fetch_array(Db::$result)){
-            $result = unserialize($Res['data']);
+            $result = ($Res['data']);
         }
-        return json_encode($result);
+        ChromePhp::log("race loaded",Db::$error, $result);
+        return ($result);
     }
 	
 	public function RaceList(){
