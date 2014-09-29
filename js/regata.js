@@ -61,9 +61,17 @@ function loadRace(id){
             //race loaded
             data = JSON.parse(data);
             console.log(data);
-            var timeStart = data['time_start']/1000, timeEnd = data['time_finish']/1000, members = data['members'];
             var race = {  stracks : [], title: data['date']+' ('+ data['number']+')', timeStart:timeStart };
 
+            var timeStart = data['time_start']/1000, timeEnd = data['time_finish']/1000, members = data['members'];
+
+            if (   !isNaN(parseFloat(data['judge_cord_lat'])) && !isNaN(parseFloat(data['judge_cord_lng']))
+                && !isNaN(parseFloat(data['start_buoy_lat'])) && !isNaN(parseFloat(data['start_buoy_lng']))){
+                var judge = new google.maps.LatLng(parseFloat(data['judge_cord_lat']), parseFloat(data['judge_cord_lng']));
+                var start_buoy = new google.maps.LatLng(parseFloat(data['start_buoy_lat']), parseFloat(data['start_buoy_lng']));
+                race.markers = [judge, start_buoy];
+                race.startLine = race.markers
+            }
 
             // load tracks in race
             $.ajax({
@@ -101,7 +109,7 @@ function loadRace(id){
                         $('#btn_back').show();
                         regata = new Regata(race);
                         regata.setShowRealTime(false);
-                        //regata.goStart();
+                        regata.goStart();
                     }
                 }
             });
@@ -123,6 +131,7 @@ function loadHistory(timeStart, timeEnd){
             $(".button").hide();
             regata = new Regata(race);
             regata.setShowRealTime(true);
+            regata.setClearTrack(true);
             for (var imei in data){
                 var element  = data[imei];
                 element.loadMe = function(){
@@ -205,15 +214,16 @@ function showOnline(fUpdate, delta){
 function Regata(_race, div) {
     div = div || "map-canvas";
     var tracks;
-    var minLat, maxLat, minLng, maxLng,  center, ts, te, deltaTime, timePerSec = 40, time;
+    var minLat, maxLat, minLng, maxLng,  center, ts, te, deltaTime, timePerSec = 40, time, prevTime;
     var playInterval, speedInterval, rotateInterval, fplaying=false, frewind=false, floaded=false, fzoom=false, fdrag=false;
-    var ffollow = false, fidle=false, fshowrealtime=false;
+    var ffollow = false, fidle=false, fshowrealtime=false, fclear = false;
     var xx, yy;
     var refereePoint, startPoint, markers;
     var overlay = new google.maps.OverlayView();
     var self = this;
     var regataRace = _race;
     var globalTimeStart = 0||_race.timeStart;
+    var timezone = (typeof _timezone == "undefined"?0:_timezone)*3600;
 
     divh = (Math.abs(sin) * $("#"+div).height() + Math.abs(cos) * $("#"+div).width())*0.5;
 
@@ -285,7 +295,7 @@ function Regata(_race, div) {
                 ],
                 strokeColor: track.color,
                 strokeOpacity: 0,
-                strokeWeight: 0.45,
+                strokeWeight: 0.5,
                 map: map
             });
             track.drawPolylines(map);
@@ -354,14 +364,23 @@ function Regata(_race, div) {
     }
 
     function animate() {
+        var redraw = false;
+        if (fclear && (!prevTime || time == ts || Math.abs(time-prevTime) > 300000)) { redraw = true; prevTime = time; }
         for (var i=0; i<tracks.length; i++){
             var track = tracks[i];
             var icon = track.line.get('icons');
             var distance =  track.caclDistance(time);
             icon[0].offset = distance / track.distance * 100 + '%';
+            //if (fclear){
+                try{ if (track.isVisible) icon[0].icon.fillOpacity = 1; else icon[0].icon.fillOpacity = 0;
+                } catch(e) {console.log(e);}
+            //}
             track.line.set('icons', icon);
+            if (redraw) {
+                track.drawPolylines(map, time);
+            }
         }
-        if (fshowrealtime)  $('#s-cur-time').html(moment.utc(time).format("HH:mm:ss"));
+        if (fshowrealtime)  $('#s-cur-time').html(moment.utc(self.getCurTime()).format("HH:mm:ss"));
         else $('#s-cur-time').html(formatGameTimeMS(time - ts));
         if (ffollow)moveToPoints();
     }
@@ -393,17 +412,17 @@ function Regata(_race, div) {
     function moveToPoints(){
         var points = [], point;
         for (var i=0; i<tracks.length; i++){
-            if (tracks[i].line.visible && tracks[i].following && time<tracks[i].te&&time>=tracks[i].ts){
+            if (tracks[i].line.visible && tracks[i].following && tracks[i].isVisible && time<tracks[i].te&&time>=tracks[i].ts){
                 point = tracks[i].getLatLng(time);
                 if (point) points.push(point);
             }
         }
         if (points.length==0) return;
         var zoom = map.getZoom();
-        var p1 = overlay.getProjection().fromContainerPixelToLatLng(new google.maps.Point(200,200));
-        var p2 = overlay.getProjection().fromContainerPixelToLatLng(new google.maps.Point(maph*2-200,maph*2-200));
+        var p1 = overlay.getProjection().fromContainerPixelToLatLng(new google.maps.Point(300,300));
+        var p2 = overlay.getProjection().fromContainerPixelToLatLng(new google.maps.Point(maph*2-300,maph*2-300));
 
-        if ((Math.abs(p1.lat() - p2.lat())*0.8 > maxLat - minLat) && (Math.abs(p1.lng() - p2.lng())*0.8 > maxLng - minLng)) zoomMap(++zoom);
+        if ((Math.abs(p1.lat() - p2.lat())*0.1 > maxLat - minLat) && (Math.abs(p1.lng() - p2.lng())*0.1 > maxLng - minLng)) zoomMap(++zoom);
 
         var hlat = Math.abs(p1.lat() - p2.lat()) / 4;
         var hlng = Math.abs(p1.lng() - p2.lng()) / 4;
@@ -454,9 +473,9 @@ function Regata(_race, div) {
 
     function zoomMap(z){
         map.setZoom(z);
-        //if (z<=15) { setMarkersRadius(12); setBoardsRadius(3); }
-        if (z<=16) { setMarkersRadius(9);  setBoardsRadius(3); }
-        if (z==17) { setMarkersRadius(6);  setBoardsRadius(5); }
+        if (z<=10) { setMarkersRadius(9); setBoardsRadius(4); }
+        else if (z<=16) { setMarkersRadius(9);  setBoardsRadius(6); }
+        if (z==17) { setMarkersRadius(6);  setBoardsRadius(7); }
         if (z >17) { setMarkersRadius(5);  setBoardsRadius(9);}
     }
 
@@ -713,9 +732,9 @@ function Regata(_race, div) {
         $('#bar').attr('min', ts);
         $('#bar').val(time);
         if (fshowrealtime) {
-            $('#s-nul-time').html(moment.utc(ts).format("HH:mm:ss"));
-            $('#s-total-time').html(moment.utc(te).format("HH:mm:ss"));
-            $('#s-cur-time').html(moment.utc(time).format("HH:mm:ss"));
+            $('#s-nul-time').html(moment.utc(ts+timezone*1000).format("HH:mm:ss"));
+            $('#s-total-time').html(moment.utc(te+timezone*1000).format("HH:mm:ss"));
+            $('#s-cur-time').html(moment.utc(self.getCurTime()).format("HH:mm:ss"));
         } else {
             $('#s-nul-time').html("-01:00");
             $('#s-total-time').html(formatGameTimeMS(te-ts));
@@ -768,7 +787,7 @@ function Regata(_race, div) {
         for (var i=0; i<time.length; i++){
             result += parseInt(time[time.length-1 - i]) * Math.pow(60, i);
         }
-        return parseInt(globalTimeStart)*1000 + result*1000;
+        return parseInt(globalTimeStart)*1000 + (result-timezone)*1000;
     };
 
 
@@ -826,20 +845,30 @@ function Regata(_race, div) {
         updateTimeLabels();
     };
 
+    this.setClearTrack = function(v) {
+        fclear = true;
+    };
+
     this.goStart = function(){
         time = ts;
-        updateTimeLabels();
-        //animate();
+        //updateTimeLabels();
+        animate();
+        $('#bar').val(time);
     };
 
     this.goEnd = function(fUpdate){
         time = te;
         //updateTimeLabels(fUpdate);
         animate();
+        $('#bar').val(time);
     };
 
     this.getTimeStart = function()
     { return globalTimeStart};
+
+    this.getCurTime = function(){
+        return time + timezone*1000;
+    }
 
 }
 
@@ -888,6 +917,7 @@ var Track = function (strack) {
     this.refereePoint = null;
     this.markers = [];
     this.following = true;
+    this.isVisible = true;
 
     var that = this;
 
@@ -949,6 +979,7 @@ var Track = function (strack) {
     }
 
     this.caclDistance = function (time) {
+        if (time > that.te || time < that.ts) that.isVisible = false; else that.isVisible = true;
         if (time >= that.te) return that.distance;
         if (time < that.ts) return 0;
         var point;
@@ -958,7 +989,10 @@ var Track = function (strack) {
                 return point.totalDistance;
             } else
             if (time >= point.time && that.points[i + 1].time > time) {
-                if (that.points[i + 1].time - point.time > 60000) return point.totalDistance;
+                if (that.points[i + 1].time - point.time > 60000) {
+                    that.isVisible = false;
+                    return point.totalDistance;
+                }
                 else return point.totalDistance + (time - point.time) / (that.points[i + 1].time - point.time) * that.points[i + 1].distance;
             }
         }
@@ -986,7 +1020,7 @@ var Track = function (strack) {
         return null;
     };
 
-    this.drawPolylines = function(map){
+    this.drawPolylines = function(map, time){
         if (this. polylines)
             for (var i = 0; i < this.polylines.length; i++){
                 this.polylines[i].setMap(null);
@@ -994,17 +1028,19 @@ var Track = function (strack) {
         var point=null, poly,  prev=null, i = 0; that.polylines = [];
         while (i<that.points.length){
             point = that.points[i];
-            if (prev == null || (point.time - prev.time > 60000)){
-                poly = new google.maps.Polyline({
-                    strokeColor: that.color,
-                    strokeOpacity: 1.0,
-                    strokeWeight: 0.45,
-                    map: map
-                });
-                that.polylines.push(poly);
+            if (!time || point.time>time){
+                if (prev == null || (point.time - prev.time > 60000)){
+                    poly = new google.maps.Polyline({
+                        strokeColor: that.color,
+                        strokeOpacity: 1.0,
+                        strokeWeight: 0.65,
+                        map: map
+                    });
+                    that.polylines.push(poly);
+                }
+                poly.getPath().push(point.LatLng);
+                prev = point;
             }
-            poly.getPath().push(point.LatLng);
-            prev = point;
             i++;
         }
     };
