@@ -32,7 +32,7 @@ html, body, #map-canvas {
 
 #middle-top-pan{
     margin: 0 auto;
-    width: 700px;
+    max-width: 700px;
 }
 #middle-pan{
     margin: 0 auto;
@@ -188,7 +188,7 @@ html, body, #map-canvas {
 #player-panel{
     background: #bfbfbf;
     width: 220px;
-    top: 10px;
+    top: 35px;
     left: 10px;
     position: absolute;
     margin-left: 0px;
@@ -377,7 +377,7 @@ table.regata_main_table tr td.no-right-border{
 	left: 10px;
 	cursor: pointer;
 	text-decoration: none;
-	top: 10px;
+	top: 3px;
 	z-index: 100;
 	display:none;
 }
@@ -484,6 +484,11 @@ table.regata_list tr td{
     height: 100%;
 }
 
+
+.history_box{
+    height: 90%;
+    overflow-y: scroll;
+}
 
 
 

@@ -1,5 +1,5 @@
 $(document).ready(function(){
-	$.ajaxSetup({ cache: false, type:"POST", url:'action.php', cache:false});
+	$.ajaxSetup({ cache: false, type:"POST", url:'/action.php', cache:false});
 	function Front(){	
 	
 		var that=this;	
@@ -108,13 +108,15 @@ $(document).ready(function(){
 		
 			
 		$('#history').bind('click', function(){
+            clearInterval(updateInterval);
 			$('.top-button').removeClass('top-button-yellow');
 			$(this).addClass('top-button-yellow');	
 			that.getHostory();
 		});
 		
 	
-		$('#race').bind('click', function(){	
+		$('#race').bind('click', function(){
+            clearInterval(updateInterval);
 			$('.top-button').removeClass('top-button-yellow');
 			$(this).addClass('top-button-yellow');	
 			that.getRace();	
@@ -183,8 +185,8 @@ $(document).ready(function(){
 				});
 				form_data['members']=members;
 				if(form_data['no_finish']=='on'){
-					form_data['finish_buoy_lat']=form_data['start_buoy_lat']
-					form_data['finish_buoy_lng']=form_data['start_buoy_lng']
+					form_data['finish_buoy_lat']=form_data['start_buoy_lat'];
+					form_data['finish_buoy_lng']=form_data['start_buoy_lng'];
 				}
 				form_data['date']=moment.utc(form_data['time_start']).format('YYYY.MM.DD');
 				console.log(form_data);
@@ -200,6 +202,7 @@ $(document).ready(function(){
 		
 		
 		$('#ready_races').bind('click', function(){
+            clearInterval(updateInterval);
 			$('.top-button').removeClass('top-button-yellow');
 			$(this).addClass('top-button-yellow');
 			$.ajax({
@@ -262,5 +265,8 @@ $(document).ready(function(){
     //var Color=new ColorSelect;
     //Color.AppendToBody($('.front_page'),$('.front_page'));
 
-    showOnline();
+    showOnline(false, 600);
+    var updateInterval = setInterval(function(){
+        showOnline(true, 600);
+    }, 2000);
 });

@@ -56,8 +56,6 @@ function loadTrack(tr) {
 function loadRace(id){
     // load race
     $.ajax({
-        type: "POST",
-        url: 'action.php',
         data:{type:'loadRace',data:id},
         success: function(data) {
             //race loaded
@@ -69,8 +67,6 @@ function loadRace(id){
 
             // load tracks in race
             $.ajax({
-                type: "POST",
-                url: 'action.php',
                 data:{type:'getRegataMembers',data:{ timeStart:timeStart, timeEnd:timeEnd,
                     filterIn:getFilter(_filterIn),
                     filterNotIn:getFilter(_filterNotIn, members)
@@ -82,8 +78,6 @@ function loadRace(id){
                     for (var imei in data){
                         var self  = data[imei];
                         $.ajax({
-                            type: "POST",
-                            url: 'action.php',
                             async: false,
                             data:{type:'getRegataTrack',data:{user_id:self.user_id, timeStart:timeStart, timeEnd: timeEnd, approximate:true}},
                             success: function(strack) {
@@ -118,8 +112,6 @@ function loadRace(id){
 
 function loadHistory(timeStart, timeEnd){
     $.ajax({
-        type: "POST",
-        url: 'action.php',
         data:{type:'getRegataMembers',data:{ timeStart:timeStart, timeEnd:timeEnd,
                                             filterIn:getFilter(_filterIn),
                                             filterNotIn:getFilter(_filterNotIn)
@@ -136,8 +128,6 @@ function loadHistory(timeStart, timeEnd){
                 element.loadMe = function(){
                     var self = this;
                     $.ajax({
-                        type: "POST",
-                        url: 'action.php',
                         data:{type:'getRegataTrack',data:{
                             user_id:self.user_id,
                             timeStart:timeStart, timeEnd: timeEnd,
@@ -163,19 +153,19 @@ function loadHistory(timeStart, timeEnd){
     });
 }
 
-function showOnline(){
-    var delta = 300;
+function showOnline(fUpdate, delta){
+    delta = delta||400;
     $.ajax({
-        type: "POST",
-        url: 'action.php',
         data:{type:'getRegataMembers',data:{delta:delta, filterIn:getFilter(_filterIn), filterNotIn:getFilter(_filterNotIn)}},
         success: function(data) {
             var race = {title:"онлайн", stracks : [] };
             data = JSON.parse(data);
-            regata = new Regata(race, "online");
-            regata.setShowRealTime(true);
-            $('#panel').hide();
-			if(data==null){
+            if (!fUpdate) {
+                regata = new Regata(race, "online");
+                regata.setShowRealTime(true);
+                $('#panel').hide();
+            }
+			if(data==null && !fUpdate){
 				console.log('ничего нет');
 				$('#player-table').append('<div style="color:black;text-align:center;font-size:14pt">нет данных</div>');
 			}
@@ -184,8 +174,6 @@ function showOnline(){
                 element.loadMe = function(){
                     var self = this;
                     $.ajax({
-                        type: "POST",
-                        url: 'action.php',
                         data:{type:'getRegataTrack',data:{
                             user_id:self.user_id,
                             delta:delta,
@@ -193,14 +181,17 @@ function showOnline(){
                         }},
                         success: function(strack) {
                             var spoints = strack.split('\r\n');
-                            regata.addTrack({
+                            strack = {
                                 lab : self.lab,
-                                imei:self.imei,
+                                imei: self.imei,
                                 color: "#"+self.color,
                                 user_id: self.user_id,
                                 spoints : spoints
-                            });
-                            regata.goEnd();
+                            };
+                            if (fUpdate) {
+                                regata.updateTrack(strack);
+                            } else regata.addTrack(strack);
+
                         }
                     });
                 };
@@ -318,28 +309,6 @@ function Regata(_race, div) {
         time = ts;
         //zoomMap(16);
     }
-
-    this.addTrack = function(strack){
-        regataRace.stracks.push(strack);
-        var track = new Track(strack);
-        tracks.push(track);
-        track.line = new google.maps.Polyline({
-            path: track.coords,
-            icons: [
-                {
-                    icon: track.marker,
-                    offset: '0%'
-                }
-            ],
-            strokeColor: track.color,
-            strokeOpacity: 0,
-            strokeWeight: 0.45,
-            map: map
-        });
-        track.drawPolylines(map);
-        updateTimeLabels();
-        showPlayers(regataRace);
-    };
 
     function play() {
         if ((!time || time == te) && !frewind) time = ts;
@@ -513,9 +482,17 @@ function Regata(_race, div) {
     function showPlayers(race) {
         $('#s-title').html(race.title);
         var phtml = "";
+        race.stracks.sort(function (a, b){
+                if(a.lab < b.lab)
+                return -1; // Или любое число, меньшее нуля
+                if(a.lab > b.lab)
+                return 1;  // Или любое число, большее нуля
+                return 0;// в случае а = b вернуть 0
+            }
+        );
         race.stracks.forEach(function (track, index, list) {
             phtml += "<div style='width: 100%; height: 20px;'>";	
-			phtml += '<input style="float:left;margin-right:5px" class="showPlayer" id="'+index+'" type="checkbox" checked>';
+			phtml += '<input style="float:left;margin-right:5px" class="showPlayer" id="'+track.user_id+'" type="checkbox" checked>';
             phtml += '<div class="circle" style="border: 2px solid ' + track.color + '; background:' + track.color + '">&nbsp;</div>';			
             phtml += '&nbsp;' + track.lab + (!!track.position?" &nbsp;&nbsp;(" + track.position + " место)":"");
             phtml += "</div>";
@@ -713,7 +690,7 @@ function Regata(_race, div) {
         if (ffollow) moveToPoints();
     }
 
-    function updateTimeLabels(){
+    function updateTimeLabels(fNotRelocate){
         ts = null; te = null; maxLat = null; maxLng = null; minLat = null; minLng = null;
         tracks.forEach(function(element){
             if (element.line.visible){
@@ -730,7 +707,7 @@ function Regata(_race, div) {
 
             }
         });
-        map.setCenter(new google.maps.LatLng(minLat + (maxLat - minLat) * 0.5, minLng + (maxLng - minLng) * 0.5));
+        if (!fNotRelocate) map.setCenter(new google.maps.LatLng(minLat + (maxLat - minLat) * 0.5, minLng + (maxLng - minLng) * 0.5));
 
         $('#bar').attr('max', te);
         $('#bar').attr('min', ts);
@@ -745,6 +722,44 @@ function Regata(_race, div) {
             $('#s-cur-time').html(formatGameTimeMS(time - ts));
         }
     }
+
+    this.addTrack = function(strack, fUpdate){
+        regataRace.stracks.push(strack);
+        var track = new Track(strack);
+        tracks.push(track);
+        track.line = new google.maps.Polyline({
+            path: track.coords,
+            icons: [
+                {
+                    icon: track.marker,
+                    offset: '0%'
+                }
+            ],
+            strokeColor: track.color,
+            strokeOpacity: 0,
+            strokeWeight: 0.45,
+            map: map
+        });
+        track.drawPolylines(map);
+        updateTimeLabels(fUpdate);
+        showPlayers(regataRace);
+        this.goEnd();
+    };
+
+    this.updateTrack = function(strack){
+        var track;
+        for(var i = 0; i < tracks.length; i++){
+            track = tracks[i];
+            if (strack.user_id && track.id == strack.user_id){
+                track.update(strack);
+                track.drawPolylines(map);
+                updateTimeLabels(true);
+                this.goEnd(true);
+                return;
+            }
+        }
+        this.addTrack(strack, true);
+    };
 
     this.getTimestamp = function(time){
         // add start time ms
@@ -767,18 +782,24 @@ function Regata(_race, div) {
             for (var i=0; i< tracks.length; i++) { tracks[i].setVisible(true); }
             return;
         }
-        var track = tracks[id];
-        if (!track) return;
-        track.setVisible(true);
-        updateTimeLabels();
+        for (var i = 0; i< tracks.length; i++){
+            if (tracks[i].id == id){
+                tracks[i].setVisible(true);
+                updateTimeLabels();
+                return;
+            }
+        }
     };
 
 
     this.hideTrack = function(id){
-        var track = tracks[id];
-        if (!track) return;
-        track.setVisible(false);
-        updateTimeLabels();
+        for (var i = 0; i< tracks.length; i++){
+            if (tracks[i].id == id){
+                tracks[i].setVisible(false);
+                updateTimeLabels();
+                return;
+            }
+        }
     };
 
 
@@ -811,10 +832,10 @@ function Regata(_race, div) {
         //animate();
     };
 
-    this.goEnd = function(){
+    this.goEnd = function(fUpdate){
         time = te;
-        updateTimeLabels();
-        //animate();
+        //updateTimeLabels(fUpdate);
+        animate();
     };
 
     this.getTimeStart = function()
@@ -876,6 +897,8 @@ var Track = function (strack) {
     initGoogleMapGraph();
 
     function initPoints(spoints){
+        that.points = [];
+        that.coords = [];
         var spoint, point, prev, time, oldTime = 0, lat, lng;
         spoints.forEach(function (element, index, list) {
             spoint = element.split(',');
@@ -964,6 +987,10 @@ var Track = function (strack) {
     };
 
     this.drawPolylines = function(map){
+        if (this. polylines)
+            for (var i = 0; i < this.polylines.length; i++){
+                this.polylines[i].setMap(null);
+            }
         var point=null, poly,  prev=null, i = 0; that.polylines = [];
         while (i<that.points.length){
             point = that.points[i];
@@ -987,6 +1014,13 @@ var Track = function (strack) {
         for (var i = 0; i < this.polylines.length; i++){
             this.polylines[i].setVisible(f);
         }
+    };
+
+
+    this.update = function(strack){
+        //if (!strack.spoints) return;
+        initPoints(strack.spoints);
+        that.line.setPath(that.coords);
     };
 
 
