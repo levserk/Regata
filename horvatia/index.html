@@ -7,13 +7,13 @@
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
 
-    <script src="/js/moment-with-langs.min.js"></script>
-    <script src="/js/races.js"></script>
-    <script src="/js/regata.js"></script>
+    <script src="../js/moment-with-langs.min.js"></script>
+    <script src="../js/races.js"></script>
+    <script src="../js/regata.js"></script>
 
 
 
-    <link rel="stylesheet" type="text/css" href="/css/style.css" />
+    <link rel="stylesheet" type="text/css" href="../css/style.css" />
 
 	<style>
 	
@@ -49,34 +49,45 @@
 
     <script type="text/javascript">
         _filterIn = [4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30];
+        _timezone = 2;
         $.ajaxSetup({ cache: false, type:"POST", url:'/action.php'});
         function loadRegata(id){
             $('.table-regata').hide();
+            $("#new_race").hide();
+            $('#bt-follow').hide();
+            $('#btn_back').show();
             loadRace(id);
         }
     </script>
 
 </head>
 <body>
+<div id="btn_back" onclick="location.reload(true)"></div>
 	<div style="display:inline-block;width:60%;vertical-align:top" class="table-regata"></br>
 		<table>
 				<tbody><tr>
 					<td width="5%" rowspan="3">Место</td>
 					<td width="5%" rowspan="3">Парус №</td>
-                    <td width="5%" rowspan="3">Цвет</td>
+                    			<td width="5%" rowspan="3">Цвет</td>
 					<td width="20%"rowspan="3">Участник</td>
-					<td colspan="1">Гонки</td>
+					<td colspan="5">Гонки</td>
 					<td width="5%" rowspan="3">Очки</td>
 					<td width="5%" rowspan="3">Гандикап</td>
 				</tr>
 				
 				<tr class="days">
-					<td colspan="1">1 день</td>
+					<td colspan="3">1 день</td>
+					<td colspan="2">2 день</td>
 					
 				</tr>
 				
 				<tr>
-					<td class="show" onclick="loadRegata(13)">1 (M)</td>
+					<td class="show" onclick="loadRegata(13)">00 (T)</td>
+					<td class="show" onclick="loadRegata(16)">01 (2)</td>
+					<td class="show" onclick="loadRegata(17)">02 (1)</td>
+					<td class="show" onclick="loadRegata(19)">03 (1.5)</td>
+					<td class="show" onclick="loadRegata(20)">04 (1)</td>
+
 				</tr>
 				
 				<tr></tr><tr>
@@ -85,6 +96,10 @@
                     <td bgcolor=#CCCCCC></td>
 					<td class="member">Череватенко Д.</td>
 					<td></td>
+					<td>16(1)</td>
+					<td>2(18)</td>
+					<td></td>
+					<td></td>
 					<td>0,0</td>
 					<td>1,0</td>
 				</tr>
@@ -92,6 +107,10 @@
 					<td>6</td>
                     <td bgcolor=#FFFF00></td>
 					<td class="member">Чирков В.</td>
+					<td></td>
+					<td>3</td>
+					<td>3(6)</td>
+					<td></td>
 					<td></td>
 					<td>0,0</td>
                     			<td>1,0</td>
@@ -102,6 +121,10 @@
                     <td bgcolor=#FF00FF></td>
 					<td class="member">Свирида И.</td>
 					<td></td>
+					<td>7</td>
+					<td>9(16)</td>
+					<td></td>
+					<td></td>
 					<td>0,0</td>
                     			<td>1,0</td>
                 </tr>
@@ -111,6 +134,10 @@
                     <td bgcolor=#CC3333></td>
 					<td class="member">Васильев А.</td>
 					<td></td>
+					<td>9</td>
+					<td>7(16)</td>
+					<td></td>
+					<td></td>
 					<td>0,0</td>
                     			<td>1,0</td>
 				</tr>
@@ -119,6 +146,10 @@
 					<td>9</td>
                     <td bgcolor=#FFFFFF></td>
                     <td class="member">Кулаков А.</td>
+					<td></td>
+					<td>8</td>
+					<td>6(14)</td>
+					<td></td>
 					<td></td>
 					<td>0,0</td>
                     			<td>1,0</td>
@@ -130,6 +161,10 @@
                     <td bgcolor=#666666></td>
 					<td class="member">Воронов</td>
 					<td></td>
+					<td>2</td>
+					<td>5(7)</td>
+					<td></td>
+					<td></td>
 					<td>0,0</td>
                     			<td>1,0</td>
 				</tr>
@@ -139,6 +174,10 @@
                     <td bgcolor=#669900></td>
 					<td class="member">Подколзин А.</td>
 					<td></td>
+					<td>11</td>
+					<td>16(дск)</td>
+					<td></td>
+					<td></td>
 					<td>0,0</td>
                     			<td>1,0</td>
 				</tr><tr>
@@ -146,6 +185,10 @@
 					<td>3</td>
                     <td bgcolor=#990066></td>
 					<td class="member">Овсянников Д.</td>
+					<td></td>
+					<td>5</td>
+					<td>4(9)</td>
+					<td></td>
 					<td></td>
 					<td>0,0</td>
                     			<td>1,0</td>
@@ -155,6 +198,10 @@
                     <td bgcolor=#990033></td>
 					<td class="member">Горев Р.</td>
 					<td></td>
+					<td>1</td>
+					<td>1(2)</td>
+					<td></td>
+					<td></td>
 					<td>0,0</td>
                     			<td>1,0</td>
 				</tr><tr>
@@ -163,6 +210,10 @@
                     <td bgcolor=#99CCCC></td>
 					<td class="member">Мовчан С.</td>
 					<td></td>
+					<td>4</td>
+					<td>10[14]</td>
+					<td></td>
+					<td></td>
 					<td>0,0</td>
                     			<td>1,0</td>
 				</tr><tr>
@@ -170,6 +221,10 @@
 					<td>14</td>
                     <td bgcolor=#330066></td>
 					<td class="member">Тихий М.</td>
+					<td></td>
+					<td>16(нф)</td>
+					<td>16</td>
+					<td></td>
 					<td></td>
 					<td>0,0</td>
                     			<td>1,0</td>
@@ -180,6 +235,10 @@
                     <td bgcolor=#006699></td>
 					<td class="member">Подгородецкий П.</td>
 					<td></td>
+					<td>16(нф)</td>
+					<td>13</td>
+					<td></td>
+					<td></td>
 					<td>0,0</td>
                     			<td>0,98</td>
 				</tr><tr>
@@ -187,6 +246,10 @@
 					<td>5</td>
                     <td bgcolor=#FF9900></td>
 					<td class="member">Яровой Д.</td>
+					<td></td>
+					<td>16(нф)</td>
+					<td>12</td>
+					<td></td>
 					<td></td>
 					<td>0,0</td>
                     			<td>0,98</td>
@@ -196,6 +259,10 @@
                     <td bgcolor=#0099CC></td>
 					<td class="member">Нароженко Д.</td>
 					<td></td>
+					<td>6</td>
+					<td>8[14]</td>
+					<td></td>
+					<td></td>
 					<td>0,0</td>
                     			<td>1,061</td>
 				</tr>
@@ -204,7 +271,11 @@
                     <td>1</td>
                     <td bgcolor=#FFCC99></td>
                     			<td class="member"></td>
-                    			<td></td>
+					<td></td>
+                    			<td>11</td>
+					<td>11</td>
+					<td></td>
+					<td></td>
                     			<td>0,0</td>
                     			<td>0,98</td>
                 </tr>

@@ -36,7 +36,7 @@ html, body, #map-canvas {
 }
 #middle-pan{
     margin: 0 auto;
-    width: 305px;
+    width: 400px;
     position: relative;
 }
 
@@ -148,6 +148,12 @@ html, body, #map-canvas {
     margin-left: 5px;
 }
 
+#zoom {
+    display: inline-block;
+    height: 31px;
+    width: 50px;
+}
+
 .bt-speed {
     width: 20px;
     height: 20px;
@@ -180,6 +186,20 @@ html, body, #map-canvas {
     right: 0;
     background-image: url('../img/right - arrow.png');
     background-size: 80%;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+#bt-zoomIn{
+    background-image: url('../img/zoomIn.png');
+    background-size: 90%;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+#bt-zoomOut{
+    background-image: url('../img/zoomOut.png');
+    background-size: 90%;
     background-position: center;
     background-repeat: no-repeat;
 }

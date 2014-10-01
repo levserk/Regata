@@ -70,7 +70,18 @@ function loadRace(id){
                 var judge = new google.maps.LatLng(parseFloat(data['judge_cord_lat']), parseFloat(data['judge_cord_lng']));
                 var start_buoy = new google.maps.LatLng(parseFloat(data['start_buoy_lat']), parseFloat(data['start_buoy_lng']));
                 race.markers = [judge, start_buoy];
-                race.startLine = race.markers
+                race.startLine = [judge, start_buoy];
+            }
+
+            if (   !isNaN(parseFloat(data['finish_buoy_lat'])) && !isNaN(parseFloat(data['finish_buoy_lng']))
+                && !isNaN(parseFloat(data['finish_buoy_2_lat'])) && !isNaN(parseFloat(data['finish_buoy_2_lng']))){
+                var finish1 = new google.maps.LatLng(parseFloat(data['finish_buoy_lat']), parseFloat(data['finish_buoy_lng']));
+                var finish2 = new google.maps.LatLng(parseFloat(data['finish_buoy_2_lat']), parseFloat(data['finish_buoy_2_lng']));
+                if (race.hasOwnProperty("markers")){
+                    race.markers.push(finish1);
+                    race.markers.push(finish2);
+                } else race.markers = [finish1, finish2];
+                race.finishLine = [finish1, finish2];
             }
 
             // load tracks in race
@@ -172,6 +183,7 @@ function showOnline(fUpdate, delta){
             if (!fUpdate) {
                 regata = new Regata(race, "online");
                 regata.setShowRealTime(true);
+                regata.setHideMarkers(false);
                 $('#panel').hide();
             }
 			if(data==null && !fUpdate){
@@ -207,7 +219,7 @@ function showOnline(fUpdate, delta){
                 element.loadMe();
             }
         }
-    })
+    });
 }
 
 
@@ -216,7 +228,7 @@ function Regata(_race, div) {
     var tracks;
     var minLat, maxLat, minLng, maxLng,  center, ts, te, deltaTime, timePerSec = 40, time, prevTime;
     var playInterval, speedInterval, rotateInterval, fplaying=false, frewind=false, floaded=false, fzoom=false, fdrag=false;
-    var ffollow = false, fidle=false, fshowrealtime=false, fclear = false;
+    var ffollow = false, fidle=false, fshowrealtime=false, fclear = false, fhidemarkers = true;
     var xx, yy;
     var refereePoint, startPoint, markers;
     var overlay = new google.maps.OverlayView();
@@ -259,7 +271,7 @@ function Regata(_race, div) {
                 'center': element,
                 'clickable': false,
                 'fillColor': "#FFF556",
-                fillOpacity: 1,
+                fillOpacity: 0.8,
                 strokeWeight: 1,
                 'map': map,
                 scale: 500,
@@ -268,7 +280,7 @@ function Regata(_race, div) {
             });
         });
 
-        // draw start line
+        // draw start finish line
         if (race.startLine || (startPoint && refereePoint)){
             var startLine = new google.maps.Polyline({
                 path: race.startLine||[startPoint,refereePoint],
@@ -283,12 +295,23 @@ function Regata(_race, div) {
             }
             //console.log(getDistance(race.startLine[0],race.startLine[1]));
         }
+        if (race.finishLine){
+            var finishLine = new google.maps.Polyline({
+                path: race.finishLine,
+                strokeColor: "#FFF556",
+                strokeOpacity: 1.0,
+                strokeWeight: 2,
+                map: map
+            });
+            //console.log(getDistance(race.startLine[0],race.startLine[1]));
+        }
         // draw tracks
         tracks.forEach(function (track, index, list) {
             track.line = new google.maps.Polyline({
                 path: track.coords,
                 icons: [
                     {
+                        labelContent: track.lab,
                         icon: track.marker,
                         offset: '0%'
                     }
@@ -371,10 +394,10 @@ function Regata(_race, div) {
             var icon = track.line.get('icons');
             var distance =  track.caclDistance(time);
             icon[0].offset = distance / track.distance * 100 + '%';
-            //if (fclear){
+            if (fhidemarkers){
                 try{ if (track.isVisible) icon[0].icon.fillOpacity = 1; else icon[0].icon.fillOpacity = 0;
                 } catch(e) {console.log(e);}
-            //}
+            }
             track.line.set('icons', icon);
             if (redraw) {
                 track.drawPolylines(map, time);
@@ -643,6 +666,14 @@ function Regata(_race, div) {
             }, 50);
         });
 
+        $('#bt-zoomIn').click(function(){
+            zoomMap(map.getZoom()+1);
+        });
+
+        $('#bt-zoomOut').click(function(){
+            zoomMap(map.getZoom()-1);
+        });
+
         $(document).on('mouseup',function(){
             clearInterval(rotateInterval);
             clearInterval(speedInterval);
@@ -691,6 +722,8 @@ function Regata(_race, div) {
         fdrag = true;
         var mx = e.clientX - $("#"+div).offset().left;
         var my = e.clientY - $("#"+div).offset().top;
+        var l = overlay.getProjection().fromContainerPixelToLatLng(new google.maps.Point(mx,my));
+        console.log('координаты без учета поворота',l.lat(), l.lng());
         xx = (((mx-divh) * cos) - ((my-divh) * sin)) + maph;
         yy = (((mx-divh) * sin) + ((my-divh) * cos)) + maph;
     }
@@ -849,6 +882,10 @@ function Regata(_race, div) {
         fclear = true;
     };
 
+    this.setHideMarkers = function(v) {
+        fhidemarkers = v;
+    };
+
     this.goStart = function(){
         time = ts;
         //updateTimeLabels();
@@ -974,7 +1011,8 @@ var Track = function (strack) {
             radius: 5,
             fillOpacity: 1,
             fillColor: that.color,
-            strokeColor: that.color
+            strokeColor: '#000000',
+            strokeWeight: 8
         };
     }
 
