@@ -61,7 +61,7 @@ function loadRace(id){
             //race loaded
             data = JSON.parse(data);
             console.log(data);
-            var race = {  stracks : [], title: data['date']+' ('+ data['number']+')', timeStart:timeStart };
+            var race = {  stracks : [], title: data['date']+' ('+ data['number']+')', timeStart:timeStart, deltaStart: -3*60*1000 };
 
             var timeStart = data['time_start']/1000, timeEnd = data['time_finish']/1000, members = data['members'];
 
@@ -222,11 +222,10 @@ function showOnline(fUpdate, delta){
     });
 }
 
-
 function Regata(_race, div) {
     div = div || "map-canvas";
     var tracks;
-    var minLat, maxLat, minLng, maxLng,  center, ts, te, deltaTime, timePerSec = 40, time, prevTime;
+    var minLat, maxLat, minLng, maxLng,  center, ts, te, deltaTime, timePerSec = 20, time, prevTime;
     var playInterval, speedInterval, rotateInterval, fplaying=false, frewind=false, floaded=false, fzoom=false, fdrag=false;
     var ffollow = false, fidle=false, fshowrealtime=false, fclear = false, fhidemarkers = true;
     var xx, yy;
@@ -236,6 +235,7 @@ function Regata(_race, div) {
     var regataRace = _race;
     var globalTimeStart = 0||_race.timeStart;
     var timezone = (typeof _timezone == "undefined"?0:_timezone)*3600;
+    var deltaStart = 0||_race.deltaStart;
 
     divh = (Math.abs(sin) * $("#"+div).height() + Math.abs(cos) * $("#"+div).width())*0.5;
 
@@ -404,7 +404,7 @@ function Regata(_race, div) {
             }
         }
         if (fshowrealtime)  $('#s-cur-time').html(moment.utc(self.getCurTime()).format("HH:mm:ss"));
-        else $('#s-cur-time').html(formatGameTimeMS(time - ts));
+        else $('#s-cur-time').html(formatGameTimeMS(time - ts + deltaStart));
         if (ffollow)moveToPoints();
     }
 
@@ -769,9 +769,9 @@ function Regata(_race, div) {
             $('#s-total-time').html(moment.utc(te+timezone*1000).format("HH:mm:ss"));
             $('#s-cur-time').html(moment.utc(self.getCurTime()).format("HH:mm:ss"));
         } else {
-            $('#s-nul-time').html("-01:00");
-            $('#s-total-time').html(formatGameTimeMS(te-ts));
-            $('#s-cur-time').html(formatGameTimeMS(time - ts));
+            if (deltaStart) $('#s-nul-time').html(formatGameTimeMS(deltaStart));  else $('#s-nul-time').html("00:00");
+            $('#s-total-time').html(formatGameTimeMS(te - ts + deltaStart));
+            $('#s-cur-time').html(formatGameTimeMS(time - ts + deltaStart));
         }
     }
 
@@ -1132,6 +1132,7 @@ var rad = function(x) {
 
 
 function formatGameTimeMS(timeMS, onlyMinutes) {
+    var sign = (timeMS>0?"":"-");
     var onlyMinutes = typeof (onlyMinutes) == "undefined" ? false : onlyMinutes;
 
     timeMS = iDiv(timeMS, 1000);
@@ -1151,13 +1152,13 @@ function formatGameTimeMS(timeMS, onlyMinutes) {
 
     if (!onlyMinutes) {
         if (hrs == 0) {
-            return min + ":" + ext("" + sec, 2, "0"); // ext("" + min, 2, "0")
+            return sign + min + ":" + ext("" + sec, 2, "0"); // ext("" + min, 2, "0")
         } else {
-            return hrs + ":" + ext("" + min, 2, "0") + ":" + ext("" + sec, 2, "0"); // ext("" + hrs, 2, "0")
+            return sign + hrs + ":" + ext("" + min, 2, "0") + ":" + ext("" + sec, 2, "0"); // ext("" + hrs, 2, "0")
         }
     } else {
         if (min == 0 && hrs == 0)
-            return sec + "&nbsp;" + I18n.contextGet("time", "secondsShortSuffix");
+            return sign + sec + "&nbsp;" + I18n.contextGet("time", "secondsShortSuffix");
         else {
             if (sec > 30)
                 min++;
@@ -1166,9 +1167,9 @@ function formatGameTimeMS(timeMS, onlyMinutes) {
                 min = 0;
             }
             if (hrs == 0) {
-                return min + "&nbsp;" + I18n.contextGet("time", "minutesShortSuffix");
+                return sign + min + "&nbsp;" + I18n.contextGet("time", "minutesShortSuffix");
             } else {
-                return hrs + "&nbsp;" + I18n.contextGet("time", "hoursSuperShortSuffix")
+                return sign + hrs + "&nbsp;" + I18n.contextGet("time", "hoursSuperShortSuffix")
                     + "&nbsp;" + min + "&nbsp;" + I18n.contextGet("time", "minutesSuperShortSuffix");
             }
         }
