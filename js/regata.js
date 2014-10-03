@@ -535,9 +535,9 @@ function Regata(_race, div) {
             }
         );
         race.stracks.forEach(function (track, index, list) {
-            phtml += "<div style='width: 100%; height: 20px;'>";
+            phtml += "<div style='width: 100%; height: 20px;'>";	
 			phtml += '<input style="float:left;margin-right:5px" class="showPlayer" id="'+track.user_id+'" type="checkbox" checked>';
-            phtml += '<div class="circle" style="border: 2px solid ' + track.color + '; background:' + track.color + '">&nbsp;</div>';
+            phtml += '<div class="circle" style="border: 2px solid ' + track.color + '; background:' + track.color + '">&nbsp;</div>';			
             phtml += '&nbsp;' + track.lab + (!!track.position?" &nbsp;&nbsp;(" + track.position + " место)":"");
             phtml += "</div>";
         });
@@ -562,7 +562,7 @@ function Regata(_race, div) {
             });
         });
     }
-
+	
     function rotate(_angle){
         angle = _angle;
         if (angle>360)angle=0;
