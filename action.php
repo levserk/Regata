@@ -221,7 +221,10 @@ class action{
 	
 	public function CreateRace($data){
 		$params=json_encode($data);
-		$query = "INSERT INTO races_from_history SET number='".$data['number']."',`date`='".$data['date']."', time_start='".$data['time_start']."', time_finish='".$data['time_finish']."', data='".$params."' ";
+		if (isset($data['id']))
+            $query = "UPDATE races_from_history SET number='".$data['number']."',`date`='".$data['date']."', time_start='".$data['time_start']."', time_finish='".$data['time_finish']."', data='".$params."' where id = ".$data['id'];
+        else
+            $query = "INSERT INTO races_from_history SET number='".$data['number']."',`date`='".$data['date']."', time_start='".$data['time_start']."', time_finish='".$data['time_finish']."', data='".$params."' ";
         ChromePhp::log($query);
         ChromePhp::log(Db::query($query), Db::$error);
 	}

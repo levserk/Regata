@@ -1,5 +1,5 @@
 $(document).ready(function(){
-	$.ajaxSetup({ cache: false, type:"POST", url:'/action.php', cache:false});
+	$.ajaxSetup({ cache: false, type:"POST", url:'/action.php'});
 	function Front(){	
 	
 		var that=this;	
@@ -130,12 +130,32 @@ $(document).ready(function(){
 		
 		//вызов окна создания новой гонки
 		$('#new_race').bind('click', function(){
+            var data = regata.getData();
 			$(this).css('background-color', '#FFF6AC');
 			
 			$("#dialog").html(that.newRace());
 			$('#race_save').button()
 			$("#dialog").attr('title','Создание новой гонки');
 			$("#dialog").dialog({width:'auto'});
+
+            //заполнение формы
+            if (data) {
+                $('.new_race_form input').each(function(){
+                    var elem=$(this);
+                    if(elem.attr('id')=='time_start' || elem.attr('id')=='time_finish'){
+                        //время начала и конца
+                        elem.val(regata.getTime(data[elem.attr('id')]));
+                    } else if(elem.attr('type') == 'checkbox'){
+                        if (elem.attr('class') != 'MemberMark'){
+                            elem.prop('checked', (data[elem.attr('id')]=='on'));
+                        } else {
+                            elem.prop('checked', (data['members'].indexOf(elem.attr('id'))!=-1));
+                        }
+                    } else{
+                        $(this).val(data[elem.attr('id')]);
+                    }
+                });
+            }
 			
 			//галочка что финишный буй и стартовый одинаковый
 			$('#no_finish').unbind();
@@ -188,7 +208,10 @@ $(document).ready(function(){
 					form_data['finish_buoy_lat']=form_data['start_buoy_lat'];
 					form_data['finish_buoy_lng']=form_data['start_buoy_lng'];
 				}
-				form_data['date']=moment.utc(form_data['time_start']).format('YYYY.MM.DD');
+				form_data['date'] = moment.utc(form_data['time_start']).format('YYYY.MM.DD');
+                form_data['angle'] = regata.getAngle();
+                form_data['globalTimeStart'] = regata.getTimeStart();
+                if (data && data.id) form_data['id'] = data.id;
 				console.log(form_data);
 				$.ajax({
 					data:{type:'CreateRace',data:form_data},

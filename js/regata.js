@@ -60,10 +60,11 @@ function loadRace(id){
         success: function(data) {
             //race loaded
             data = JSON.parse(data);
+            data.id = id;
             console.log(data);
-            var race = {  stracks : [], title: data['date']+' ('+ data['number']+')', timeStart:timeStart, deltaStart: -3*60*1000 };
-
-            var timeStart = data['time_start']/1000, timeEnd = data['time_finish']/1000, members = data['members'];
+            var deltaStart =  -3*60*1000;
+            var race = {  stracks : [], title: data['date']+' ('+ data['number']+')', timeStart:data['globalTimeStart'], deltaStart:deltaStart, data:data, angle:data['angle'] };
+            var timeStart = (parseInt(data['time_start'])+ deltaStart)/1000, timeEnd = data['time_finish']/1000, members = data['members'];
 
             if (   !isNaN(parseFloat(data['judge_cord_lat'])) && !isNaN(parseFloat(data['judge_cord_lng']))
                 && !isNaN(parseFloat(data['start_buoy_lat'])) && !isNaN(parseFloat(data['start_buoy_lng']))){
@@ -236,6 +237,7 @@ function Regata(_race, div) {
     var globalTimeStart = 0||_race.timeStart;
     var timezone = (typeof _timezone == "undefined"?0:_timezone)*3600;
     var deltaStart = 0||_race.deltaStart;
+    var data = _race.data;
 
     divh = (Math.abs(sin) * $("#"+div).height() + Math.abs(cos) * $("#"+div).width())*0.5;
 
@@ -823,6 +825,13 @@ function Regata(_race, div) {
         return parseInt(globalTimeStart)*1000 + (result-timezone)*1000;
     };
 
+    this.getTime = function(timestamp){
+        timestamp = parseInt(timestamp);
+        var result = formatGameTimeMS(timestamp + timezone*1000 - globalTimeStart*1000);
+        if (result.length<7)result = "00:" + result;
+        return result;
+    };
+
 
     this.getTracks = function(){
         return tracks;
@@ -831,7 +840,7 @@ function Regata(_race, div) {
 
     this.showTrack = function(id){
         if (id != 0 && !id) {
-            for (var i=0; i< tracks.length; i++) { tracks[i].setVisible(true); }
+            for (var i = 0; i< tracks.length; i++) { tracks[i].setVisible(true); }
             return;
         }
         for (var i = 0; i< tracks.length; i++){
@@ -905,6 +914,14 @@ function Regata(_race, div) {
 
     this.getCurTime = function(){
         return time + timezone*1000;
+    };
+
+    this.getData = function(){
+        return data;
+    };
+
+    this.getAngle = function(){
+        return angle;
     }
 
 }
@@ -1019,10 +1036,11 @@ var Track = function (strack) {
     this.caclDistance = function (time) {
         if (time > that.te || time < that.ts) that.isVisible = false; else that.isVisible = true;
         if (time >= that.te) return that.distance;
-        if (time < that.ts) return 0;
+        if (time < that.ts)  return 0;
         var point;
-        for (var i=0; i<that.points.length; i++){
+        for (var i = 0; i < that.points.length; i++){
             point = that.points[i];
+
             if (i == that.points.length - 1) {
                 return point.totalDistance;
             } else
