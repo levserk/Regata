@@ -94,8 +94,9 @@ $(document).ready(function(){
 			fields[5]='<div style="margin-top:5px">круговая гонка<input id="no_finish" type="checkbox"></div>';
 			fields[6]='<div>координаты финишного буя:<br> lat <input type="text" id="finish_buoy_lat"> lng <input type="text" id="finish_buoy_lng"></div>';
 			fields[7]='<div>координаты второго финишного буя: </br> lat <input type="text" id="finish_buoy_2_lat"> lng <input type="text" id="finish_buoy_2_lng"></div>';
-			//fields[8]='<div>направление второго финишного буя: <input type="text" id="finish_buoy_direction_2"></div>';
-			fields[8]='<div style="margin-top:10px">'+that.CreateMembersCheckbox(that.MemberList())+'</div>';
+			fields[8]='<div>буй 1: </br>lat <input type="text" id="buy1_lat"> lan <input type="text" id="buy1_lan"></div>';
+			fields[9]='<div>буй 2: </br>lat <input type="text" id="buy2_lat"> lan <input type="text" id="buy2_lan"></div>';
+			fields[10]='<div style="margin-top:10px">'+that.CreateMembersCheckbox(that.MemberList())+'</div>';
 			
 			var form='<div class="new_race_form">';
 			for(var i=0;i<fields.length;i++){

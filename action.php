@@ -140,9 +140,11 @@ class action{
             $where.= " ) ";
         }
 
-        $query = "SELECT id, imei, name, color
-                    FROM  users
-                    WHERE exists(select 1 from tracks
+        $query = "SELECT users.id, imei, user_names.name, user_names.color
+                      FROM  users
+                      JOIN user_names on users.id = user_id
+                    WHERE  date_start<=FROM_UNIXTIME($timeStart/1000) and (date_end is null or date_end>=FROM_UNIXTIME($timeStart/1000))
+                    and exists(select 1 from tracks
                     where user_id = users.id and $where )";
         ChromePhp::log($query);
         Db::query($query);
