@@ -65,7 +65,7 @@ function loadRace(id){
             var deltaStart =  -3*60*1000;
             var race = {  stracks : [], title: data['date']+' ('+ data['number']+')', timeStart:data['globalTimeStart'], deltaStart:deltaStart, data:data, angle:parseInt(data['angle']) };
             var timeStart = (parseInt(data['time_start'])+ deltaStart)/1000, timeEnd = data['time_finish']/1000, members = data['members'];
-
+            race.markers = [];
             if (   !isNaN(parseFloat(data['judge_cord_lat'])) && !isNaN(parseFloat(data['judge_cord_lng']))
                 && !isNaN(parseFloat(data['start_buoy_lat'])) && !isNaN(parseFloat(data['start_buoy_lng']))){
                 var judge = new google.maps.LatLng(parseFloat(data['judge_cord_lat']), parseFloat(data['judge_cord_lng']));
@@ -84,6 +84,12 @@ function loadRace(id){
                 } else race.markers = [finish1, finish2];
                 race.finishLine = [finish1, finish2];
             }
+
+            if (!isNaN(parseFloat(data['buoy1_lat'])) && !isNaN(parseFloat(data['buoy1_lng'])))
+                race.markers.push(new google.maps.LatLng(parseFloat(data['buoy1_lat']), parseFloat(data['buoy1_lng'])));
+
+            if (!isNaN(parseFloat(data['buoy2_lat'])) && !isNaN(parseFloat(data['buoy2_lng'])))
+                race.markers.push(new google.maps.LatLng(parseFloat(data['buoy2_lat']), parseFloat(data['buoy2_lng'])));
 
             // load tracks in race
             $.ajax({
@@ -498,8 +504,11 @@ function Regata(_race, div) {
 
     function zoomMap(z){
         map.setZoom(z);
-        if (z<=10) { setMarkersRadius(9); setBoardsRadius(4); }
-        else if (z<=16) { setMarkersRadius(9);  setBoardsRadius(6); }
+        if (z<=10) { setMarkersRadius(100); setBoardsRadius(4); }
+        else if (z<=12) { setMarkersRadius(80);  setBoardsRadius(6); }
+        else if (z<=13) { setMarkersRadius(40);  setBoardsRadius(6); }
+        else if (z<=14) { setMarkersRadius(20);  setBoardsRadius(6); }
+        else if (z<=16) { setMarkersRadius(10);  setBoardsRadius(6); }
         if (z==17) { setMarkersRadius(6);  setBoardsRadius(7); }
         if (z >17) { setMarkersRadius(5);  setBoardsRadius(9);}
     }
