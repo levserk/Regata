@@ -63,7 +63,7 @@ function loadRace(id){
             data.id = id;
             console.log(data);
             var deltaStart =  -3*60*1000;
-            var race = {  stracks : [], title: data['date']+' ('+ data['number']+')', timeStart:data['globalTimeStart'], deltaStart:deltaStart, data:data, angle:data['angle'] };
+            var race = {  stracks : [], title: data['date']+' ('+ data['number']+')', timeStart:data['globalTimeStart'], deltaStart:deltaStart, data:data, angle:parseInt(data['angle']) };
             var timeStart = (parseInt(data['time_start'])+ deltaStart)/1000, timeEnd = data['time_finish']/1000, members = data['members'];
 
             if (   !isNaN(parseFloat(data['judge_cord_lat'])) && !isNaN(parseFloat(data['judge_cord_lng']))
@@ -397,7 +397,7 @@ function Regata(_race, div) {
             var distance =  track.caclDistance(time);
             icon[0].offset = distance / track.distance * 100 + '%';
             if (fhidemarkers){
-                try{ if (track.isVisible) icon[0].icon.fillOpacity = 1; else icon[0].icon.fillOpacity = 0;
+                try{ if (track.isVisible()) icon[0].icon.fillOpacity = 1; else icon[0].icon.fillOpacity = 0;
                 } catch(e) {console.log(e);}
             }
             track.line.set('icons', icon);
@@ -437,7 +437,7 @@ function Regata(_race, div) {
     function moveToPoints(){
         var points = [], point;
         for (var i=0; i<tracks.length; i++){
-            if (tracks[i].line.visible && tracks[i].following && tracks[i].isVisible && time<tracks[i].te&&time>=tracks[i].ts){
+            if (tracks[i].line.visible && tracks[i].following && tracks[i].isVisible() && time<tracks[i].te&&time>=tracks[i].ts){
                 point = tracks[i].getLatLng(time);
                 if (point) points.push(point);
             }
@@ -564,6 +564,7 @@ function Regata(_race, div) {
     }
 	
     function rotate(_angle){
+        if (typeof _angle != "number"  || isNaN(_angle)) _angle = 0;
         angle = _angle;
         if (angle>360)angle=0;
         if (angle<0)angle=360;
@@ -913,7 +914,7 @@ function Regata(_race, div) {
     { return globalTimeStart};
 
     this.getCurTime = function(){
-        return time + timezone*1000;
+        return time||0 + timezone*1000;
     };
 
     this.getData = function(){
@@ -971,7 +972,7 @@ var Track = function (strack) {
     this.refereePoint = null;
     this.markers = [];
     this.following = true;
-    this.isVisible = true;
+    this.fIsVisible = true;
 
     var that = this;
 
@@ -1034,7 +1035,7 @@ var Track = function (strack) {
     }
 
     this.caclDistance = function (time) {
-        if (time > that.te || time < that.ts) that.isVisible = false; else that.isVisible = true;
+        if (time > that.te || time < that.ts) that.fIsVisible = false; else that.fIsVisible = true;
         if (time >= that.te) return that.distance;
         if (time < that.ts)  return 0;
         var point;
@@ -1046,7 +1047,7 @@ var Track = function (strack) {
             } else
             if (time >= point.time && that.points[i + 1].time > time) {
                 if (that.points[i + 1].time - point.time > 60000) {
-                    that.isVisible = false;
+                    that.fIsVisible = false;
                     return point.totalDistance;
                 }
                 else return point.totalDistance + (time - point.time) / (that.points[i + 1].time - point.time) * that.points[i + 1].distance;
@@ -1081,6 +1082,7 @@ var Track = function (strack) {
             for (var i = 0; i < this.polylines.length; i++){
                 this.polylines[i].setMap(null);
             }
+        if (!this.line.visible) return;
         var point=null, poly,  prev=null, i = 0; that.polylines = [];
         while (i<that.points.length){
             point = that.points[i];
@@ -1103,9 +1105,14 @@ var Track = function (strack) {
 
     this.setVisible = function(f){
         this.line.setVisible(f);
-        for (var i = 0; i < this.polylines.length; i++){
-            this.polylines[i].setVisible(f);
-        }
+        if (this. polylines)
+            for (var i = 0; i < this.polylines.length; i++){
+                this.polylines[i].setVisible(f);
+            }
+    };
+
+    this.isVisible = function(){
+        return this.fIsVisible && this.line && this.line.visible;
     };
 
 

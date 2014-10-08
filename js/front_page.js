@@ -1,5 +1,5 @@
 $(document).ready(function(){
-	$.ajaxSetup({ cache: false, type:"POST", url:'/action.php'});
+	$.ajaxSetup({ cache: false, type:"POST", url:'action.php'});
 	function Front(){	
 	
 		var that=this;	
@@ -149,7 +149,7 @@ $(document).ready(function(){
                         if (elem.attr('class') != 'MemberMark'){
                             elem.prop('checked', (data[elem.attr('id')]=='on'));
                         } else {
-                            elem.prop('checked', (data['members'].indexOf(elem.attr('id'))!=-1));
+                            elem.prop('checked', !data['members'] || (data['members'] && data['members'].indexOf(elem.attr('id'))!=-1));
                         }
                     } else{
                         $(this).val(data[elem.attr('id')]);

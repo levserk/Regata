@@ -44,6 +44,19 @@
 	.cen{
 		text-align:center;
 	}
+	
+	div.table-regata table tr td.left{
+		text-align:center;
+	}
+	
+	
+	div.table-regata table tr td.days-s{
+		font-size:8pt;
+	}
+	
+	small{
+	
+	}
 		
 	</style>
 
@@ -63,15 +76,16 @@
 </head>
 <body>
 <div id="btn_back" onclick="location.reload(true)"></div>
-	<div style="display:inline-block;width:60%;vertical-align:top" class="table-regata"></br>
+	<div style="display:block;width:1150px;vertical-align:top;margin:0 auto" class="table-regata"></br>
 		<table>
 				<tbody><tr>
-					<td width="5%" rowspan="3">Парус №</td>
+					<td width="2.5%" rowspan="3">№</td>
+					<td width="5%" rowspan="3">№ лодки</td>
                     <td width="5%" rowspan="3">Цвет</td>
-					<td width="20%"rowspan="3">Участник</td>
-					<td colspan="9">Гонки</td>
-					<td width="5%" rowspan="3">Очки</td>
+					<td width="12%" rowspan="3">Участник</td>
 					<td width="5%" rowspan="3">Гандикап</td>
+					<td colspan="10">Гонки</td>
+					<td width="5%" rowspan="3">Очки</td>				
 				</tr>
 				
 				<tr class="days">
@@ -80,258 +94,324 @@
                     <td colspan="2">3 день</td>
                     <td colspan="1">4 день</td>
                     <td colspan="1">5 день</td>
+                    <td colspan="1">6 день</td>
 
 				</tr>
 				
 				<tr>
-					<td class="show" onclick="loadRegata(13)">00 (T)</td>
-					<td class="show" onclick="loadRegata(16)">01 (2)</td>
-					<td class="show" onclick="loadRegata(17)">02 (1)</td>
-					<td class="show" onclick="loadRegata(19)">03 (1.5)</td>
-					<td class="show" onclick="loadRegata(20)">04 (1)</td>
-                    <td class="show" onclick="loadRegata(21)">05 (М)</td>
-                    <td class="show" onclick="loadRegata(22)">06 (М)</td>
-                    <td class="show" onclick="loadRegata(23)">07 (М)</td>
-                    <td class="show" onclick="loadRegata(24)">08 (2)</td>
-
+					<td class="show days-s" onclick="loadRegata(27)">Т (1 круг)</td>
+					<td class="show days-s" onclick="loadRegata(28)">1 (2 круга)</td>
+					<td class="show days-s" onclick="loadRegata(29)">2 (1 круга)</td>
+					<td class="show days-s" onclick="loadRegata(30)">3 (2с круга)</td>
+					<td class="show days-s" onclick="loadRegata(31)">4 (1 круг)</td>
+                    <td class="show days-s" onclick="loadRegata(32)">5 (маршрут)</td>
+                    <td class="show days-s" onclick="loadRegata(33)">6 (маршрут)</td>
+                    <td class="show days-s" onclick="loadRegata(34)">7 (маршрут)</td>
+					<td class="days-s"></td>
+					<td class="show days-s" onclick="loadRegata(35)">8</br> (2 круга)</td>
 				</tr>
 				
 				<tr></tr><tr>
-
+					<td>1</td>
 					<td>15</td>
-                    <td bgcolor=#000></td>
+                    <td bgcolor="#000"></td>
 					<td class="member">Череватенко Д.</td>
-					<td></td>
-					<td>16(дск)</td>
-					<td>2(18)</td>
-					<td>1</td>
-					<td>1</td>
-                    <td>2</td>
-                    <td>2</td>
-                    <td>7</td>
-                    <td></td>
-					<td>25,0</td>
 					<td>1,0</td>
+					<td class="left"></td>
+					<td class="left">(16<small> дск)</small></td>
+					<td class="left">(2)</td>
+					<td class="left">1</td>
+					<td class="left">1</td>
+                    <td class="left">2</td>
+                    <td class="left">2</td>
+                    <td class="left">1</td>
+                    <td class="left"></td>
+                    <td class="left">1</td>
+					<td>8,0</td>
+					
 				</tr>
 					<tr>
+					<td>2</td>
 					<td>6</td>
-                    <td bgcolor=#FF00FF></td>
+                    <td bgcolor="#FF00FF"></td>
 					<td class="member">Чирков В.</td>
-					<td></td>
-					<td>3</td>
-					<td>3(6)</td>
-                    <td>6</td>
-					<td>2</td>
-					<td>1</td>
-                    <td>1</td>
-                    <td>4</td>
-                    <td></td>
-					<td>20,0</td>
-                    <td>1,0</td>
+					 <td>1,0</td>
+					<td class="left"></td>
+					<td class="left">3</td>
+					<td class="left">3</td>
+                    <td class="left">(6)</td>
+					<td class="left">2</td>
+					<td class="left">1</td>
+                    <td class="left">1</td>
+                    <td class="left">(4)</td>
+                    <td class="left"></td>
+                    <td class="left">2</td>
+					<td>12,0</td>
+                   
 				</tr>
+				
 				<tr>
-					<td>2</td>
-                    <td bgcolor=#7BAFFD></td>
-					<td class="member">Свирида И.</td>
-					<td></td>
-					<td>7</td>
-					<td>9(16)</td>
+					<td>3</td>
+					<td>4</td>
+                    <td bgcolor="#666666"></td>
+					<td class="member">Горев Р.</td>
+					 <td>1,0</td>
+					<td class="left"></td>
+					<td class="left">1</td>
+					<td class="left">1</td>
+					<td class="left">3</td>
+					<td class="left">(6)</td>
+                    <td class="left">5</td>
+                    <td class="left">(7)</td>
+                    <td class="left">2</td>
+                    <td class="left"></td>
+                    <td class="left">3</td>
+					<td>15,0</td>
+                   
+				</tr>
+				
+				<tr>
 					<td>4</td>
 					<td>3</td>
-                    <td>4</td>
-                    <td>(11)</td>
-                    <td>9</td>
-                    <td></td>
-					<td>47,0</td>
-                    <td>1,0</td>
-                </tr>
-<tr>
-					<td>13</td>
-                    <td bgcolor=#FFFFFF></td>
-					<td class="member">Васильев А.</td>
-					<td></td>
-					<td>9</td>
-					<td>7(16)</td>
-					<td>7</td>
-					<td>9</td>
-                    <td>(10)</td>
-                    <td>3</td>
-                    <td>8</td>
-                    <td></td>
-					<td>53,0</td>
-                    <td>1,0</td>
+                    <td bgcolor="#796263"></td>
+					<td class="member">Овсянников Д.</td>
+					<td>1,0</td>
+					<td class="left"></td>
+					<td class="left">5</td>
+					<td class="left">4</td>
+					<td class="left">2</td>
+					<td class="left">(10)</td>
+                    <td class="left">3</td>
+                    <td class="left">(6)</td>
+                    <td class="left">3</td>
+                    <td class="left"></td>
+                    <td class="left">4</td>
+					<td>21,0</td>
+                    
 				</tr>
+				
 				<tr>
-					<td>9</td>
-                    <td bgcolor=#FF9900></td>
-                    <td class="member">Кулаков А.</td>
-					<td></td>
-					<td>8</td>
-					<td>6(14)</td>
 					<td>5</td>
+					<td>2</td>
+                    <td bgcolor="#7BAFFD"></td>
+					<td class="member">Чайкин М.</td>
+					<td>1,0</td>
+					<td class="left"></td>
+					<td class="left">7</td>
+					<td class="left">(9)</td>
+					<td class="left">4</td>
+					<td class="left">3</td>
+                    <td class="left">4</td>
+                    <td class="left">(11)</td>
+                    <td class="left">9</td>
+                    <td class="left"></td>
+                    <td class="left">8</td>
+					<td>35,0</td>
+                    
+                </tr>
+				
+				<tr>
+					<td>6</td>
+					<td>9</td>
+                    <td bgcolor="#FF9900"></td>
+                    <td class="member">Кулаков А.</td>
+					<td>1,0</td>
+					<td class="left"></td>
+					<td class="left">8</td>
+					<td class="left">6</td>
+					<td class="left">5</td>
+					<td class="left">7</td>
+                    <td class="left">(11)</td>
+                    <td class="left">(12)</td>
+                    <td class="left">6</td>
+                    <td class="left"></td>
+                    <td class="left">7</td>
+					<td>39,0</td>
+                    
+				</tr>
+				
+				<tr>
 					<td>7</td>
-                    <td>11</td>
-                    <td>(12)</td>
-                    <td>6</td>
-                    <td></td>
-					<td>55,0</td>
-                    <td>1,0</td>
+					<td>8</td>
+                    <td bgcolor="#f7f791"></td>
+					<td class="member">Воронов</td>
+					<td>1,0</td>
+					<td class="left"></td>
+					<td class="left">2</td>
+					<td class="left">5</td>
+					<td class="left">(12)</td>
+					<td class="left">11</td>
+                    <td class="left">8</td>
+                    <td class="left">8</td>
+                    <td class="left">7</td>
+                    <td class="left"></td>
+                    <td class="left">(16<small> нф)</small></td>
+					<td>41,0</td>
+                    
 				</tr>
 				
 				<tr>
 					<td>8</td>
-                    <td bgcolor=#f7f791></td>
-					<td class="member">Воронов</td>
-					<td></td>
-					<td>2</td>
-					<td>5(7)</td>
-					<td>(12)</td>
-					<td>11</td>
-                    <td>8</td>
-                    <td>8</td>
-                    <td>7</td>
-                    <td></td>
-					<td>53,0</td>
-                    <td>1,0</td>
-				</tr>
-				<tr>
-					<td>7</td>
-                    <td bgcolor=#68CEFD></td>
-					<td class="member">Подколзин А.</td>
-					<td></td>
-					<td>11</td>
-					<td>16(дск)</td>
-					<td>11</td>
-					<td>16(нф)</td>
-                    <td>6</td>
-                    <td>13</td>
-                    <td>12</td>
-                    <td></td>
-					<td>85,0</td>
-                    <td>1,0</td>
-				</tr><tr>
-					<td>3</td>
-                    <td bgcolor=#796263></td>
-					<td class="member">Овсянников Д.</td>
-					<td></td>
-					<td>5</td>
-					<td>4(9)</td>
-					<td>2</td>
-					<td>(10)</td>
-                    <td>3</td>
-                    <td>6</td>
-                    <td>3</td>
-                    <td></td>
-					<td>33,0</td>
-                    <td>1,0</td>
-				</tr><tr>
-					<td>4</td>
-                    <td bgcolor=#666666></td>
-					<td class="member">Горев Р.</td>
-					<td></td>
-					<td>1</td>
-					<td>1(2)</td>
-					<td>3</td>
-					<td>6</td>
-                    <td>5</td>
-                    <td>(7)</td>
-                    <td>2</td>
-                    <td></td>
-					<td>25,0</td>
-                    <td>1,0</td>
-				</tr><tr>
 					<td>10</td>
-                    <td bgcolor=#669900></td>
+                    <td bgcolor="#669900"></td>
 					<td class="member">Мовчан С.</td>
-					<td></td>
-					<td>4</td>
-					<td>10[14]</td>
-					<td>10</td>
-					<td>16(нф)</td>
-                    <td>7</td>
-                    <td>4</td>
-                    <td>10</td>
-                    <td></td>
-					<td>61,0</td>
-                    <td>1,0</td>
-				</tr><tr>
-					<td>14</td>
-                    <td bgcolor=#330066></td>
-					<td class="member">Тихий М.</td>
-					<td></td>
-					<td>16(нф)</td>
-					<td>16</td>
-					<td>14</td>
-					<td>16(нф)</td>
-                    <td>16(нс)</td>
-                    <td>16(нс)</td>
-                    <td>16(нс)</td>
-                    <td></td>
-					<td>110,0</td>
-                    <td>1,0</td>
+					<td>1,0</td>
+					<td class="left"></td>
+					<td class="left">4</td>
+					<td class="left">(10)</td>
+					<td class="left">10</td>
+					<td class="left">(16<small> нф)</small></td>
+                    <td class="left">7</td>
+                    <td class="left">4</td>
+                    <td class="left">10</td>
+                    <td class="left"></td>
+                    <td class="left">6</td>
+					<td>41,0</td>
+                    
 				</tr>
+				
+				<tr>
+					<td>9</td>
+					<td>11</td>
+                    <td bgcolor="#0099CC"></td>
+					<td class="member">Нароженко Д.</td>
+					<td>1,04</td>
+					<td class="left"></td>
+					<td class="left">6</td>
+					<td class="left">8</td>
+					<td class="left">8</td>
+					<td class="left">5</td>
+                    <td class="left">(12)</td>
+                    <td class="left">9</td>
+                    <td class="left">(14)</td>
+                    <td class="left"></td>
+                    <td class="left">5</td>
+					<td>41,0</td>
+                    
+				</tr>
+				
+				<tr>
+					<td>10</td>	
+                    <td>1</td>
+                    <td bgcolor="#E0A86F"></td>
+                    <td class="member">Жарков</td>
+					<td>0,97</td>
+					<td class="left"></td>
+                    <td class="left">10</td>
+					<td class="left">(11)</td>
+					<td class="left">9</td>
+					<td class="left">4</td>
+                    <td class="left">9</td>
+                    <td class="left">5</td>
+                    <td class="left">5</td>
+                    <td class="left"></td>
+                    <td class="left">(16<small> нф)</small></td>
+                    <td>42,0</td>
+                    
+                </tr>
+				
+				<tr>
+					<td>11</td>
+					<td>13</td>
+                    <td bgcolor="#FFFFFF"></td>
+					<td class="member">Васильев А.</td>
+					<td>1,0</td>
+					<td class="left"></td>
+					<td class="left">9</td>
+					<td class="left">7</td>
+					<td class="left">7</td>
+					<td class="left">9</td>
+                    <td class="left">(10)</td>
+                    <td class="left">3</td>
+                    <td class="left">8</td>
+                    <td class="left"></td>
+                    <td class="left">(16<small> нф)</small></td>
+					<td>43,0</td>
+                   
+				</tr>
+				
 				<tr>
 					<td>12</td>
-                    <td bgcolor=#CC3333></td>
-					<td class="member">Подгородецкий П.</td>
-					<td></td>
-					<td>16(нф)</td>
-					<td>13</td>
-					<td>16(нф)</td>
-					<td>16(нф)</td>
-                    <td>14</td>
-                    <td>14</td>
-                    <td>13</td>
-                    <td></td>
-					<td>102,0</td>
-                    <td>0,98</td>
-				</tr><tr>
 					<td>5</td>
-                    <td bgcolor=#990033></td>
+                    <td bgcolor="#990033"></td>
 					<td class="member">Яровой Д.</td>
-					<td></td>
-					<td>16(нф)</td>
-					<td>12</td>
-					<td>13</td>
-					<td>8</td>
-                    <td>13</td>
-                    <td>10</td>
-                    <td>11</td>
-                    <td></td>
-					<td>83,0</td>
-                    <td>0,98</td>
-				</tr><tr>
-					<td>11</td>
-                    <td bgcolor=#0099CC></td>
-					<td class="member">Нароженко Д.</td>
-					<td></td>
-					<td>6</td>
-					<td>8[14]</td>
-					<td>8</td>
-					<td>5</td>
-                    <td>12</td>
-                    <td>9</td>
-                    <td>(14)</td>
-                    <td></td>
-					<td>62,0</td>
-                    <td>1,061</td>
+					<td>0,97</td>
+					<td class="left"></td>
+					<td class="left">(16<small> нф)</small></td>
+					<td class="left">12</td>
+					<td class="left">13</td>
+					<td class="left">8</td>
+                    <td class="left">13</td>
+                    <td class="left">10</td>
+                    <td class="left">11</td>
+                    <td class="left"></td>
+                    <td class="left">(16<small> нф)</small></td>
+					<td>67,0</td>
+                    
 				</tr>
-                		</tr><tr>
-                    <td>1</td>
-                    <td bgcolor=#E0A86F></td>
-                    <td class="member">Жарков</td>
+
+			
+				<tr>
+					<td>13</td>
+					<td>7</td>
+                    <td bgcolor="#68CEFD"></td>
+					<td class="member">Подколзин А.</td>
+					<td>1,0</td>
+					<td class="left"></td>
+					<td class="left">11</td>
+					<td class="left">(16<small> дск)</small></td>
+					<td class="left">11</td>
+					<td class="left">(16<small> нф)</small></td>
+                    <td class="left">6</td>
+                    <td class="left">13</td>
+                    <td class="left">12</td>
+                    <td class="left"></td>
+                    <td class="left">16<small> нф</small></td>
+					<td>69,0</td>
+                    
+				</tr>
+				
+				<tr>
+					<td>14</td>
+					<td>12</td>
+                    <td bgcolor="#CC3333"></td>
+					<td class="member">Подгородецкий П.</td>
+					<td>0,97</td>
 					<td></td>
-                    <td>10</td>
-					<td>(11)</td>
-					<td>9</td>
-					<td>4</td>
-                    <td>9</td>
-                    <td>5</td>
-                    <td>5</td>
-                    <td></td>
-                    <td>53,0</td>
-                    <td>0,98</td>
-                </tr>
+					<td class="left">(16<small> нф)</small></td>
+					<td class="left">13</td>
+					<td class="left">(16<small> нф)</small></td>
+					<td class="left">16<small> (нф)</small></td>
+                    <td class="left">14</td>
+                    <td class="left">14</td>
+                    <td class="left">13</td>
+                    <td class="left"></td>
+                    <td class="left">16<small> нф</small></td>
+					<td>86,0</td>
+                    
+				</tr>
+
+				<tr>
+					<td>15</td>
+					<td>14</td>
+                    <td bgcolor="#330066"></td>
+					<td class="member">Тихий М.</td>
+					<td>1,0</td>
+					<td class="left"></td>
+					<td class="left">(16<small> нф)</small></td>
+					<td class="left">(16 <small>фс)</small></td>
+					<td class="left">14</td>
+					<td class="left">16<small> нф</small></td>
+                    <td class="left">16<small> нс</small></td>
+                    <td class="left">16<small> нс</small></td>
+                    <td class="left">16<small> нс</small></td>
+                    <td class="left"></td>
+                    <td class="left">16<small> нф</small></td>
+					<td>94,0</td>
+                    
+				</tr>
+				
+                		
 				</tbody></table>
 	</div>
 
