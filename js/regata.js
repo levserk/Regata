@@ -313,6 +313,10 @@ function Regata(_race, div) {
             });
             //console.log(getDistance(race.startLine[0],race.startLine[1]));
         }
+
+        // cut track after finish line intersection
+        if (typeof _fcutTracks != "undefined" && _fcutTracks)findFinishIntersection();
+
         // draw tracks
         tracks.forEach(function (track, index, list) {
             track.line = new google.maps.Polyline({
@@ -591,7 +595,9 @@ function Regata(_race, div) {
     function getLatLng(mx,my){
         mx -= $("#"+div).offset().left;
         my -= $("#"+div).offset().top;
+        try{
         return overlay.getProjection().fromContainerPixelToLatLng(new google.maps.Point((((mx-divh) * cos) - ((my-divh) * sin)) + maph, (((mx-divh) * sin) + ((my-divh) * cos)) + maph));
+        } catch(e){ return({}) }
     }
 
 
@@ -730,12 +736,19 @@ function Regata(_race, div) {
 
     function onMouseOut(){ fdrag = false; }
 
+
+    var interLines = [];
     function onMouseDown(e){
         fdrag = true;
         var mx = e.clientX - $("#"+div).offset().left;
         var my = e.clientY - $("#"+div).offset().top;
         var l = overlay.getProjection().fromContainerPixelToLatLng(new google.maps.Point(mx,my));
         console.log('координаты без учета поворота',l.lat(), l.lng());
+        interLines.push(new Point(0, l.lat(), l.lng()));
+        if (interLines.length==4){
+            console.log(intersection(interLines[0],interLines[1],interLines[2],interLines[3]));
+            interLines = [];
+        }
         xx = (((mx-divh) * cos) - ((my-divh) * sin)) + maph;
         yy = (((mx-divh) * sin) + ((my-divh) * cos)) + maph;
     }
@@ -784,6 +797,14 @@ function Regata(_race, div) {
             if (deltaStart) $('#s-nul-time').html(formatGameTimeMS(deltaStart));  else $('#s-nul-time').html("00:00");
             $('#s-total-time').html(formatGameTimeMS(te - ts + deltaStart));
             $('#s-cur-time').html(formatGameTimeMS(time - ts + deltaStart));
+        }
+    }
+
+    function findFinishIntersection(){
+        if (!_race.finishLine) return;
+        for (var i=0; i < tracks.length; i++){
+            var intersection = tracks[i].findPointAfterIntersection({lat:_race.finishLine[0].lat(), lng:_race.finishLine[0].lng()},{lat:_race.finishLine[1].lat(), lng:_race.finishLine[1].lng()});
+            console.log(formatGameTimeMS(intersection.time-ts-timezone*1000));
         }
     }
 
@@ -856,7 +877,7 @@ function Regata(_race, div) {
         for (var i = 0; i< tracks.length; i++){
             if (tracks[i].id == id){
                 tracks[i].setVisible(true);
-                updateTimeLabels();
+                updateTimeLabels(!!(typeof _fNotRelocate!="undefined" && _fNotRelocate));
                 return;
             }
         }
@@ -867,7 +888,7 @@ function Regata(_race, div) {
         for (var i = 0; i< tracks.length; i++){
             if (tracks[i].id == id){
                 tracks[i].setVisible(false);
-                updateTimeLabels();
+                updateTimeLabels(!!(typeof _fNotRelocate!="undefined" && _fNotRelocate));
                 return;
             }
         }
@@ -932,7 +953,15 @@ function Regata(_race, div) {
 
     this.getAngle = function(){
         return angle;
-    }
+    };
+
+    this.cutTracks = function(f){
+        if (f) findFinishIntersection();
+        for (var i=0; i<tracks.length; i++){
+            if (!f) tracks[i].finishTime = null;
+            tracks[i].drawPolylines(map);
+        }
+    };
 
 }
 
@@ -1044,6 +1073,7 @@ var Track = function (strack) {
     }
 
     this.caclDistance = function (time) {
+        if (this.finishTime && time>this.finishTime) time = this.finishTime;
         if (time > that.te || time < that.ts) that.fIsVisible = false; else that.fIsVisible = true;
         if (time >= that.te) return that.distance;
         if (time < that.ts)  return 0;
@@ -1063,6 +1093,24 @@ var Track = function (strack) {
             }
         }
         return 0;
+    };
+
+    this.findPointAfterIntersection = function(p1, p2, time){
+        //if (!(p1 && p2 && p1.lat && p2.lng)||this.points.length<2) return false;
+        var first = this.points[this.points.length-1], last, i=this.points.length- 2, intersec;
+        while(i>0 && (!time || first.time>time)){
+            last = this.points[i];
+            if (Math.abs(last.time - first.time) > 1000){
+                intersec = intersection(p1,p2,first,last);
+                if (intersec){
+                    this.finishTime = first.time;
+                    return first;
+                }
+                first = last;
+            }
+            i--;
+        }
+        return false;
     };
 
     this.getLatLng = function(time, first){
@@ -1096,7 +1144,7 @@ var Track = function (strack) {
         while (i<that.points.length){
             point = that.points[i];
             if (!time || point.time>time){
-                if (prev == null || (point.time - prev.time > 60000)){
+                if (prev == null || (point.time - prev.time > 60000) || (this.finishTime && point.time>this.finishTime)){
                     poly = new google.maps.Polyline({
                         strokeColor: that.color,
                         strokeOpacity: 1.0,
@@ -1108,6 +1156,7 @@ var Track = function (strack) {
                 poly.getPath().push(point.LatLng);
                 prev = point;
             }
+            if ( (this.finishTime && point.time>this.finishTime)) return;
             i++;
         }
     };
@@ -1163,6 +1212,41 @@ var getDistance = function(p1, p2) { // in meters from points
 var rad = function(x) {
     return x * Math.PI / 180;
 };
+
+
+
+function intersection(start1, end1, start2, end2) {
+    var dir1 = {lat:(end1.lat - start1.lat), lng:(end1.lng - start1.lng)};
+    var dir2 = {lat:(end2.lat - start2.lat), lng:(end2.lng - start2.lng)};
+
+    //считаем уравнения прямых проходящих через отрезки
+    var a1 = -dir1.lng;
+    var b1 = +dir1.lat;
+    var d1 = -(a1*start1.lat + b1*start1.lng);
+
+    var a2 = -dir2.lng;
+    var b2 = +dir2.lat;
+    var d2 = -(a2*start2.lat + b2*start2.lng);
+
+    //подставляем концы отрезков, для выяснения в каких полуплоскотях они
+    var seg1_line2_start = a2*start1.lat + b2*start1.lng + d2;
+    var seg1_line2_end = a2*end1.lat + b2*end1.lng + d2;
+
+    var seg2_line1_start = a1*start2.lat + b1*start2.lng + d1;
+    var seg2_line1_end = a1*end2.lat + b1*end2.lng + d1;
+
+    //если концы одного отрезка имеют один знак, значит он в одной полуплоскости и пересечения нет.
+    if (seg1_line2_start * seg1_line2_end >= 0 || seg2_line1_start * seg2_line1_end >= 0)
+        return false;
+
+    var u = seg1_line2_start / (seg1_line2_start - seg1_line2_end);
+
+    //var pin_out = Point2f({x: u, y: u}, '*', dir1);
+    var pin_out = {lat:u * dir1.lat, lng:u * dir1.lng};
+
+    //return Point2f(start1, '+', pin_out);
+    return {lat:start1.lat+pin_out.lat, lng:start1.lng+pin_out.lng};
+}
 
 
 function formatGameTimeMS(timeMS, onlyMinutes) {
