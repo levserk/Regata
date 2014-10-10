@@ -228,13 +228,23 @@ html, body, #map-canvas {
 }
 
 .circle {
-    width:7px;
-    height:7px;
+    width: 12px;
+    height: 12px;
     border-radius: 15px;
     float: left;
-    margin-right: 0px;
-    margin-top: 5px;
+    margin-right: 0;
+    margin-top: 4px;
+    overflow: hidden;
 }
+
+.circle input {
+    width: 40px;
+    height: 40px;
+    margin-top: -14px;
+    margin-left: -14px;
+    border: none;
+}
+
 #bt-follow{
     position: absolute;
     top: 7px;

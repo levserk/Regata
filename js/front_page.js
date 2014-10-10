@@ -1,5 +1,5 @@
 $(document).ready(function(){
-	$.ajaxSetup({ cache: false, type:"POST", url:'action.php'});
+	$.ajaxSetup({ cache: false, type:"POST", url:'/action.php'});
 	function Front(){	
 	
 		var that=this;	
@@ -87,7 +87,7 @@ $(document).ready(function(){
 			var fields=[];
 			fields[0]='<div>№ гонки: <input type="text" id="number"></div>';
 			fields[1]='<div>время старта: <input type="text" id="time_start"></div>';
-			fields[2]='<div>время финиша: <input type="text" id="time_finish"></div>';
+			fields[2]='<div>время финиша: <input type="text" id="time_finish">минут после финиша: <input type="text" id="time_finish_delta"></div>';
 			fields[3]='<div>координаты судейской лодки:</br> lat <input type="text" id="judge_cord_lat"> lng <input type="text" id="judge_cord_lng"></div>';
 			fields[4]='<div>координаты стартового буя:</br> lat <input type="text" id="start_buoy_lat"> lng <input type="text" id="start_buoy_lng"></div>';
 			//fields[5]='<div>направление стартового буя: <input type="text" id="direct_buoy"></div>';

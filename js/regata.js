@@ -63,7 +63,9 @@ function loadRace(id){
             data.id = id;
             console.log(data);
             var deltaStart =  -3*60*1000;
-            var race = {  stracks : [], title: data['date']+' ('+ data['number']+')', timeStart:data['globalTimeStart'], deltaStart:deltaStart, data:data, angle:parseInt(data['angle']) };
+            var deltaFinish = parseFloat(data['time_finish_delta']);
+            if (isNaN(deltaFinish)) deltaFinish = 60; else deltaFinish *= 60;
+            var race = {  stracks : [], title: data['date']+' ('+ data['number']+')', timeStart:data['globalTimeStart'], deltaStart:deltaStart, deltaFinish:deltaFinish, data:data, angle:parseInt(data['angle']) };
             var timeStart = (parseInt(data['time_start'])+ deltaStart)/1000, timeEnd = data['time_finish']/1000, members = data['members'];
             race.markers = [];
             if (   !isNaN(parseFloat(data['judge_cord_lat'])) && !isNaN(parseFloat(data['judge_cord_lng']))
@@ -93,7 +95,7 @@ function loadRace(id){
 
             // load tracks in race
             $.ajax({
-                data:{type:'getRegataMembers',data:{ timeStart:timeStart, timeEnd:timeEnd,
+                data:{type:'getRegataMembers',data:{ timeStart:timeStart, timeEnd:timeEnd+deltaFinish,
                     filterIn:getFilter(_filterIn),
                     filterNotIn:getFilter(_filterNotIn, members)
                 }},
@@ -105,7 +107,7 @@ function loadRace(id){
                         var self  = data[imei];
                         $.ajax({
                             async: false,
-                            data:{type:'getRegataTrack',data:{user_id:self.user_id, timeStart:timeStart, timeEnd: timeEnd, approximate:true}},
+                            data:{type:'getRegataTrack',data:{user_id:self.user_id, timeStart:timeStart, timeEnd: timeEnd+deltaFinish, approximate:true}},
                             success: function(strack) {
                                 var spoints = strack.split('\r\n');
                                 race.stracks.push({
@@ -540,17 +542,25 @@ function Regata(_race, div) {
         $('#s-title').html(race.title);
         var phtml = "";
         race.stracks.sort(function (a, b){
-                if(a.lab < b.lab)
-                return -1; // Или любое число, меньшее нуля
-                if(a.lab > b.lab)
-                return 1;  // Или любое число, большее нуля
-                return 0;// в случае а = b вернуть 0
+                if (!a.result){
+                    if(a.lab < b.lab)
+                    return -1;
+                    if(a.lab > b.lab)
+                    return 1;
+                    return 0;
+                } else {
+                    if(a.result < b.result && a>0)
+                        return -1;
+                    if(a.result > b.result || a.result < 0)
+                        return 1;
+                    return 0;// в случае а = b вернуть 0
+                }
             }
         );
         race.stracks.forEach(function (track, index, list) {
             phtml += "<div style='width: 100%; height: 20px;'>";	
 			phtml += '<input style="float:left;margin-right:5px" class="showPlayer" id="'+track.user_id+'" type="checkbox" checked>';
-            phtml += '<div class="circle" style="border: 2px solid ' + track.color + '; background:' + track.color + '">&nbsp;</div>';			
+            phtml += '<div class="circle" ><input type="color" value="'+track.color +'" id="'+track.user_id+'"></div>';
             phtml += '&nbsp;' + track.lab + (!!track.position?" &nbsp;&nbsp;(" + track.position + " место)":"");
             phtml += "</div>";
         });
@@ -574,6 +584,10 @@ function Regata(_race, div) {
                 regata.hideTrack(id);
             });
         });
+
+        $('.circle input').change(function(){
+            regata.setTrackColor($(this).attr('id'), $(this).val());
+        })
     }
 	
     function rotate(_angle){
@@ -801,11 +815,14 @@ function Regata(_race, div) {
     }
 
     function findFinishIntersection(){
-        if (!_race.finishLine) return;
+        if (!_race.finishLine && !_race.startLine) return;
+        var line = _race.finishLine || _race.startLine;
         for (var i=0; i < tracks.length; i++){
-            var intersection = tracks[i].findPointAfterIntersection({lat:_race.finishLine[0].lat(), lng:_race.finishLine[0].lng()},{lat:_race.finishLine[1].lat(), lng:_race.finishLine[1].lng()});
-            console.log(formatGameTimeMS(intersection.time-ts-timezone*1000));
+            var  intersect= tracks[i].findPointAfterIntersection({lat:line[0].lat(), lng:line[0].lng()},{lat:line[1].lat(), lng:line[1].lng()} ,_race.finishTime);
+            console.log(tracks[i].lab, formatGameTimeMS(intersect.time-ts-timezone*1000));
+            if (intersect) _race.stracks[i].result = intersect.time; else _race.stracks[i].result = -1;
         }
+        showPlayers(_race);
     }
 
     this.addTrack = function(strack, fUpdate){
@@ -912,6 +929,16 @@ function Regata(_race, div) {
         track.following = false;
     };
 
+    this.setTrackColor = function(id, color){
+        console.log("user_id:", id, 'color:', color);
+        for (var i = 0; i< tracks.length; i++){
+            if (tracks[i].id == id){
+                tracks[i].setColor(color);
+                return;
+            }
+        }
+    };
+
 
     this.setShowRealTime = function(v){
         fshowrealtime = v;
@@ -962,6 +989,8 @@ function Regata(_race, div) {
             tracks[i].drawPolylines(map);
         }
     };
+
+
 
 }
 
@@ -1095,10 +1124,19 @@ var Track = function (strack) {
         return 0;
     };
 
+
+    this.findPointIdAtTime = function(time){
+        if (time<this.ts||time>this.te) return false;
+        for (var i = 0; i< this.points.length-1; i++){
+            if (this.points[i].time<time&&this.points[i+1].time>=time) return i;
+        }
+        return false;
+    };
+
     this.findPointAfterIntersection = function(p1, p2, time){
         //if (!(p1 && p2 && p1.lat && p2.lng)||this.points.length<2) return false;
         var first = this.points[this.points.length-1], last, i=this.points.length- 2, intersec;
-        while(i>0 && (!time || first.time>time)){
+        if (!time) while(i>0){
             last = this.points[i];
             if (Math.abs(last.time - first.time) > 1000){
                 intersec = intersection(p1,p2,first,last);
@@ -1109,6 +1147,22 @@ var Track = function (strack) {
                 first = last;
             }
             i--;
+        } else if (time < this.te){
+            i = this.findPointIdAtTime(time);
+            if (!i) return false;
+            first = this.points[++i];
+            while (i<this.points.length){
+                last = this.points[i];
+                if (Math.abs(last.time - first.time) > 1000){
+                    intersec = intersection(p1,p2,first,last);
+                    if (intersec){
+                        this.finishTime = last.time;
+                        return last;
+                    }
+                    first = last;
+                }
+                i++;
+            }
         }
         return false;
     };
@@ -1159,6 +1213,17 @@ var Track = function (strack) {
             if ( (this.finishTime && point.time>this.finishTime)) return;
             i++;
         }
+    };
+
+    this.setColor = function(color){
+        this.color = color; //.setOptions({strokeColor:color}
+        var icon = this.line.get('icons');
+        icon[0].icon.fillColor = color;
+        this.line.set('icons', icon);
+        if (this. polylines)
+            for (var i = 0; i < this.polylines.length; i++){
+                this.polylines[i].setOptions({strokeColor:color});
+            }
     };
 
     this.setVisible = function(f){
