@@ -65,7 +65,7 @@ function loadRace(id){
             var deltaStart =  -3*60*1000;
             var deltaFinish = parseFloat(data['time_finish_delta']);
             if (isNaN(deltaFinish)) deltaFinish = 60; else deltaFinish *= 60;
-            var race = {  stracks : [], title: data['date']+' ('+ data['number']+')', timeStart:data['globalTimeStart'], deltaStart:deltaStart, deltaFinish:deltaFinish, data:data, angle:parseInt(data['angle']) };
+            var race = {  stracks : [], title: data['date']+' ('+ data['number']+')', timeStart:data['globalTimeStart'],timeFinish:data['time_finish'], deltaStart:deltaStart, deltaFinish:deltaFinish, data:data, angle:parseInt(data['angle']) };
             var timeStart = (parseInt(data['time_start'])+ deltaStart)/1000, timeEnd = data['time_finish']/1000, members = data['members'];
             race.markers = [];
             if (   !isNaN(parseFloat(data['judge_cord_lat'])) && !isNaN(parseFloat(data['judge_cord_lng']))
@@ -543,17 +543,15 @@ function Regata(_race, div) {
         var phtml = "";
         race.stracks.sort(function (a, b){
                 if (!a.result){
-                    if(a.lab < b.lab)
-                    return -1;
-                    if(a.lab > b.lab)
-                    return 1;
+                    if(a.lab < b.lab) return -1;
+                    if(a.lab > b.lab) return 1;
                     return 0;
                 } else {
-                    if(a.result < b.result && a>0)
-                        return -1;
-                    if(a.result > b.result || a.result < 0)
-                        return 1;
-                    return 0;// в случае а = b вернуть 0
+                    if (a.result < 0) return 1;
+                    if (b.result < 0) return -1;
+                    if(a.result < b.result) return -1;
+                    if(a.result > b.result) return 1;
+                    return 0;
                 }
             }
         );
@@ -818,9 +816,11 @@ function Regata(_race, div) {
         if (!_race.finishLine && !_race.startLine) return;
         var line = _race.finishLine || _race.startLine;
         for (var i=0; i < tracks.length; i++){
-            var  intersect= tracks[i].findPointAfterIntersection({lat:line[0].lat(), lng:line[0].lng()},{lat:line[1].lat(), lng:line[1].lng()} ,_race.finishTime);
-            console.log(tracks[i].lab, formatGameTimeMS(intersect.time-ts-timezone*1000));
-            if (intersect) _race.stracks[i].result = intersect.time; else _race.stracks[i].result = -1;
+            var  intersect = tracks[i].findPointAfterIntersection({lat:line[0].lat(), lng:line[0].lng()},{lat:line[1].lat(), lng:line[1].lng()} ,_race.timeFinish);
+            console.log(tracks[i].label, formatGameTimeMS(intersect.time-ts-timezone));
+            for (var j = 0; j < _race.stracks.length; j++) if(tracks[i].id == _race.stracks[j].user_id) {
+                if (intersect) _race.stracks[j].result = intersect.time; else _race.stracks[j].result = -1;
+            }
         }
         showPlayers(_race);
     }
@@ -1135,6 +1135,7 @@ var Track = function (strack) {
 
     this.findPointAfterIntersection = function(p1, p2, time){
         //if (!(p1 && p2 && p1.lat && p2.lng)||this.points.length<2) return false;
+        time -= 15*60000;
         var first = this.points[this.points.length-1], last, i=this.points.length- 2, intersec;
         if (!time) while(i>0){
             last = this.points[i];
