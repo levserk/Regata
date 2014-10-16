@@ -65,7 +65,16 @@ function loadRace(id){
             var deltaStart =  -3*60*1000;
             var deltaFinish = parseFloat(data['time_finish_delta']);
             if (isNaN(deltaFinish)) deltaFinish = 60; else deltaFinish *= 60;
-            var race = {  stracks : [], title: data['date']+' ('+ data['number']+')', timeStart:data['globalTimeStart'],timeFinish:data['time_finish'], deltaStart:deltaStart, deltaFinish:deltaFinish, data:data, angle:parseInt(data['angle']) };
+            var race = {
+                stracks : [],
+                title: data['number'] + '<br>' + data['date'],
+                timeStart:data['globalTimeStart'],
+                timeFinish:data['time_finish'],
+                deltaStart:deltaStart,
+                deltaFinish:deltaFinish,
+                data:data,
+                angle:parseInt(data['angle'])
+            };
             var timeStart = (parseInt(data['time_start'])+ deltaStart)/1000, timeEnd = data['time_finish']/1000, members = data['members'];
             race.markers = [];
             if (   !isNaN(parseFloat(data['judge_cord_lat'])) && !isNaN(parseFloat(data['judge_cord_lng']))
@@ -971,7 +980,8 @@ function Regata(_race, div) {
     { return globalTimeStart};
 
     this.getCurTime = function(){
-        return time||0 + timezone*1000;
+        if (typeof time == "undefined" || time == null) return ts||timezone*1000;
+        return time + timezone*1000;
     };
 
     this.getData = function(){
@@ -1135,7 +1145,7 @@ var Track = function (strack) {
 
     this.findPointAfterIntersection = function(p1, p2, time){
         //if (!(p1 && p2 && p1.lat && p2.lng)||this.points.length<2) return false;
-        time -= 15*60000;
+        time -= 10*60000;
         var first = this.points[this.points.length-1], last, i=this.points.length- 2, intersec;
         if (!time) while(i>0){
             last = this.points[i];
@@ -1157,7 +1167,7 @@ var Track = function (strack) {
                 if (Math.abs(last.time - first.time) > 1000){
                     intersec = intersection(p1,p2,first,last);
                     if (intersec){
-                        this.finishTime = last.time;
+                        this.finishTime = last.time+25000;
                         return last;
                     }
                     first = last;
