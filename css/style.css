@@ -522,6 +522,15 @@ table.regata_list tr td{
 
 
 
+/*костыль*/
+
+
+.table-regata table tr td.ReadyRace{
+	cursor: pointer;
+	vertical-align: middle;
+	background: #f7f791;
+}
+
 
 
 

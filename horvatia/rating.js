@@ -102,6 +102,7 @@ $(document).ready(function(){
 	$('body').on('click','td.raiting', function(){
 	
 		$('tr.table_head td').css('background-color','white');
+		$('tr.table_head td.show').css('background-color','#f7f791'); 
 		$(this).css('background-color','lightgray');
 		var new_rating=new Rating();
 		new_rating.doSortable($(this));	

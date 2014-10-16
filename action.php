@@ -538,139 +538,256 @@ class action{
 				<tbody><tr>
 					<td width="5%" rowspan="3">Место</td>
 					<td width="5%" rowspan="3">Парус №</td>
-					<td rowspan="3">Участник</td>
-					<td colspan="2">Гонки</td>
-					<td rowspan="3">Очки</td>
+					<td width="20%" rowspan="3">Участник</td>
+					<td width="65%" colspan="10">Гонки</td>
+					<td width="5%" rowspan="3">Очки</td>
 				</tr>
 				
 				<tr class="days">
 					<td colspan="1">1 день</td>
-					<td colspan="1">2 день</td>
+					<td colspan="2">2 день</td>
+					<td colspan="3">3 день</td>
+					<td colspan="4">4 день</td>
+					
 				</tr>
 				
 				<tr>
-					<td class="show" data-track-id="19">1 (2)</td>
-					<td class="show" data-track-id="20">2 (1)</td>
+					<td id="36" class="ReadyRace">0 (Т)</td>
+					<td id="37" class="ReadyRace">1 (1)</td>
+					<td id="38" class="ReadyRace">2 (1)</td>
+					<td id="39" class="ReadyRace">3 (1)</td>
+					<td id="40" class="ReadyRace">4 (1)</td>
+					<td id="41" class="ReadyRace">5 (1)</td>
+					<td id="42" class="ReadyRace">6 (1)</td>
+					<td id="43" class="ReadyRace">7 (1)</td>
+					<td id="44" class="ReadyRace">8 (1)</td>
+					<td id="45" class="ReadyRace">9 (1)</td>
 				</tr>
 				
-				<tr>
-					<td>0</td>
-					<td>39</td>
-					<td class="member">Vasinkevich Mikhail</td>
-					<td>0</td>
-					<td>0</td>	
-					<td> - </td>	
-				</tr>
-				<tr>
-					<td>0</td>
-					<td>40</td>
-					<td class="member">Samoylov Yury</td>
-					<td>0</td>
-					<td>0</td>	
-					<td> - </td>	
-				</tr>
-				<tr>
-					<td>0</td>
-					<td>41</td>
-					<td class="member">Dzedziushka Siarhei</td>
-					<td>0</td>
-					<td>0</td>	
-					<td> - </td>	
-				</tr>
-				<tr>
-					<td>0</td>
+				<tr></tr><tr>
+					<td>1</td>
 					<td>42</td>
 					<td class="member">Faynberg Feliks</td>
-					<td>0</td>
-					<td>0</td>	
-					<td> - </td>	
+					<td>(2)</td>
+					<td>1</td>	
+					<td>1</td>	
+					<td>1</td>
+					<td>1</td>
+					<td>1</td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td>5,0</td>	
+				</tr>
+					<tr><td>2</td>
+					<td>39</td>
+					<td class="member">Vasinkevich Mikhail</td>
+					<td>3</td>
+					<td>2</td>	
+					<td>2</td>	
+					<td>(7)</td>
+					<td>2</td>
+					<td>3</td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td>12,0</td>	
 				</tr>
 				<tr>
-					<td>0</td>
-					<td>43</td>
-					<td class="member">Pinkhasik Dmitrii</td>
-					<td>0</td>
-					<td>0</td>	
-					<td> - </td>	
-				</tr>
-				<tr>
-					<td>0</td>
-					<td>44</td>
-					<td class="member">Bibichev Igor</td>
-					<td>0</td>
-					<td>0</td>	
-					<td> - </td>	
-				</tr>
-				<tr>
-					<td>0</td>
+					<td>3</td>
 					<td>45</td>
 					<td class="member">Tuzlukov Vasily</td>
-					<td>0</td>
-					<td>0</td>	
-					<td> - </td>	
+					<td>1</td>
+					<td>4</td>	
+					<td>3</td>	
+					<td>2</td>
+					<td>(5)</td>
+					<td>5</td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td>15,0</td>	
+				</tr>
+<tr>
+					<td>4</td>
+					<td>40</td>
+					<td class="member">Samoylov Yury</td>
+					<td>4</td>
+					<td>3</td>	
+					<td>(6)</td>
+					<td>3</td>
+					<td>4</td>
+					<td>2</td>	
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td>16,0</td>	
 				</tr>
 				<tr>
-					<td>0</td>
+					<td>5</td>
+					<td>41</td>
+					<td class="member">Dzedziushka Siarhei</td>
+					<td>5</td>
+					<td>5</td>	
+					<td>(8)</td>
+					<td>8</td>
+					<td>6</td>
+					<td>6</td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td>30,0</td>	
+				</tr>
+				
+				<tr>
+					<td>6</td>
+					<td>43</td>
+					<td class="member">Pinkhasik Dmitrii</td>
+					<td>(12)</td>
+					<td>10</td>	
+					<td>5</td>
+					<td>4</td>
+					<td>3</td>
+					<td>9</td>	
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td>31,0</td>	
+				</tr>
+				<tr>
+					<td>7</td>
 					<td>52</td>
 					<td class="member">Fomin Alexei</td>
-					<td>0</td>
-					<td>0</td>	
-					<td> - </td>	
-				</tr>
-				<tr>
-					<td>0</td>
-					<td>47</td>
-					<td class="member">Trusov Alexander</td>
-					<td>0</td>
-					<td>0</td>	
-					<td> - </td>	
-				</tr>
-				<tr>
-					<td>0</td>
+					<td>6</td>
+					<td>(dnf)</td>	
+					<td>4</td>	
+					<td>11</td>
+					<td>7</td>
+					<td>4</td>	
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td>32,0</td>	
+				</tr><tr>
+					<td>8</td>
 					<td>48</td>
 					<td class="member">Polyanovsky Anatoly</td>
-					<td>0</td>
-					<td>0</td>	
-					<td> - </td>	
-				</tr>
-				<tr>
-					<td>0</td>
-					<td>49</td>
-					<td class="member">Andreev Oleg</td>
-					<td>0</td>
-					<td>0</td>	
-					<td> - </td>	
-				</tr>
-				<tr>
-					<td>0</td>
-					<td>50</td>
-					<td class="member">Gurevich Ilya</td>
-					<td>0</td>
-					<td>0</td>	
-					<td> - </td>	
+					<td>(10)</td>
+					<td>6</td>	
+					<td>10</td>
+					<td>6</td>
+					<td>8</td>
+					<td>7</td>	
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td>37,0</td>	
 				</tr><tr>
-					<td>0</td>
+					<td>9</td>
 					<td>46</td>
 					<td class="member">Mironov Aleksei</td>
-					<td>0</td>
-					<td>0</td>	
-					<td> - </td>	
+					<td>7</td>
+					<td>9</td>	
+					<td>9</td>
+					<td>9</td>
+					<td>10</td>
+					<td>(dnf)</td>	
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td>44,0</td>	
+				</tr><tr>
+					<td>10</td>
+					<td>50</td>
+					<td class="member">Gurevich Ilya</td>
+					<td>8</td>
+					<td>7</td>	
+					<td>11</td>	
+					<td>(dnc)</td>
+					<td>9</td>
+					<td>10</td>	
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td>45,0</td>	
+				</tr><tr>
+					<td>11</td>
+					<td>44</td>
+					<td class="member">Bibichev Igor</td>
+					<td>11</td>
+					<td>(osc)</td>	
+					<td>7</td>	
+					<td>5</td>
+					<td>11</td>
+					<td>12</td>	
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td>46,0</td>	
 				</tr>
 				<tr>
-					<td>0</td>
+					<td>12</td>
+					<td>47</td>
+					<td class="member">Trusov Alexander</td>
+					<td>9</td>
+					<td>8</td>	
+					<td>12</td>	
+					<td>10</td>
+					<td>(13)</td>
+					<td>8</td>	
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td>47,0</td>	
+				</tr><tr>
+					<td>13</td>
 					<td>53</td>
 					<td class="member">Nikitin Aleksei</td>
-					<td>0</td>
-					<td>0</td>	
-					<td> - </td>	
+					<td>14</td>
+					<td>(dnf)</td>	
+					<td>14</td>	
+					<td>12</td>
+					<td>12</td>
+					<td>11</td>	
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td>63,0</td>	
 				</tr><tr>
-					<td>0</td>
-					<td>38</td>
-					<td class="member">Yuri Fadeev</td>
-					<td>0</td>
-					<td>0</td>	
-					<td> - </td>	
+					<td>14</td>
+					<td>49</td>
+					<td class="member">Andreev Oleg</td>
+					<td>13</td>
+					<td>(dnf)</td>	
+					<td>13</td>	
+					<td>osc</td>
+					<td>14</td>
+					<td>13</td>	
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td>68,0</td>	
 				</tr>
+				
+				
+				
+				
+				
+				
 				
 				</tbody></table>';
 	}			

@@ -29,11 +29,19 @@
 		margin: 0 auto;
 	}
 	
+	
 	div.table-regata table tr td {
 		border: 1px solid #CCC;
-		padding: 4px;
-		text-align: center;
+		padding: 3px;
+		text-align: left;
+		padding-left:20px;
 	}
+	
+	div.table-regata table tr.table_head td {
+		text-align:center;
+		padding-left:4px;
+	}
+	
 	
 	div.table-regata table tr td.show {
 		cursor: pointer;
@@ -46,7 +54,8 @@
 	}
 	
 	div.table-regata table tr td.left{
-		text-align:center;
+		text-align:left;
+		padding-left:20px;
 	}
 	
 	
@@ -60,6 +69,26 @@
 	
 	body .table-regata tr.table_head td{
 		cursor:pointer;
+	}
+	
+	
+	div.table-regata table tr td.boat_name{
+		text-align:left;
+		padding-left:5px;
+		text-transform: capitalize;
+	}
+	
+	div.table-regata table tr td.member{
+		text-align:left;
+		padding-left:26px;
+	}
+	
+	div.table-regata table tr td#user{
+		width:135px;
+	}
+	
+	.bracket{
+		color:gray;
 	}
 		
 	</style>
@@ -82,29 +111,28 @@
 </head>
 <body>
 <div id="btn_back" onclick="location.reload(true)"></div>
-	<div style="display:block;width:1150px;vertical-align:top;margin:0 auto" class="table-regata"></br>
+	<div style="display:block;width:1220px;vertical-align:top;margin:0 auto" class="table-regata"></br>
 		<table class="sortable">
 				<tbody>
 				<tr class="table_head">
 									
                     <td width="5%" rowspan="3">Цвет</td>
 					<td width="12%" rowspan="3"id="user" class="raiting">Участник</td>
-					<td width="5%" rowspan="3" id="gandicap" class="raiting">Гандикап</td>
+					<td width="5%" rowspan="3" id="gandicap" class="raiting">Ган</td>
 					<td width="5%" rowspan="3" id="boat_name" class="raiting">Название лодки</td>
 					<td width="5%" rowspan="3" id="boat_number" class="raiting">№ лодки</td>
 					
-					<td colspan="10">Гонки</td>
+					<td colspan="9">Гонки</td>
 					<td width="5%" rowspan="3" id="points" class="raiting">Очки</td>
-					<td width="2.5%" rowspan="3" id="place" class="raiting">№</td>			
+					<td width="2.5%" rowspan="3" id="place" class="raiting">Место</td>			
 				</tr>
 				
 				<tr class="days table_head">
-					<td colspan="3">1 день</td>
-					<td colspan="2">2 день</td>
-                    <td colspan="2">3 день</td>
-                    <td colspan="1">4 день</td>
-                    <td colspan="1">5 день</td>
-                    <td colspan="1">6 день</td>
+					<td colspan="3">1 (28.09 Вс)</td>
+					<td colspan="2">2 (29.09 Пн)</td>
+                    <td colspan="2">3 (30.09 Вт)</td>
+                    <td colspan="1">4 (01.10 Ср)</td>
+                    <td colspan="1">6 (03.10 Пт)</td>
 
 				</tr>
 				
@@ -117,7 +145,6 @@
                     <td class="show days-s" onclick="loadRegata(32)">5 (М)</td>
                     <td class="show days-s" onclick="loadRegata(33)">6 (М)</td>
                     <td class="show days-s" onclick="loadRegata(34)">7 (М)</td>
-					<td class="days-s"></td>
 					<td class="show days-s" onclick="loadRegata(35)">8 (2)</td>
 				</tr>
 				
@@ -127,20 +154,19 @@
                     <td bgcolor="#000"></td>
 					<td class="member">Череватенко Д.</td>
 					<td>1.0</td>
-					<td>DEVIATY</td>
+					<td class="boat_name">Deviaty</td>
 					<td>15</td>
 					
-					<td class="left"></td>
-					<td class="left">(16<small> дск)</small></td>
-					<td class="left">(2)</td>
+					<td class="left">1</td>
+					<td class="left"><span class="bracket">(</span>16<span class="bracket">)</span> <small>дск</small></td>
+					<td class="left"><span class="bracket">(</span>2<span class="bracket">)</span></td>
 					<td class="left">1</td>
 					<td class="left">1</td>
                     <td class="left">2</td>
                     <td class="left">2</td>
                     <td class="left">1</td>
-                    <td class="left"></td>
                     <td class="left">1</td>
-					<td>8.0</td>
+					<td>8</td>
 					<td>1</td>
 					
 				</tr>
@@ -150,20 +176,19 @@
                     <td bgcolor="#FF00FF"></td>
 					<td class="member">Чирков В.</td>
 					 <td>1.0</td>
-					 <td>PHAZAN</td>
+					 <td class="boat_name">Phazan</td>
 					 <td>6</td>
 					 
-					<td class="left"></td>
+					<td class="left">4</td>
 					<td class="left">3</td>
 					<td class="left">3</td>
-                    <td class="left">(6)</td>
+                    <td class="left"><span class="bracket">(</span>6<span class="bracket">)</span></td>
 					<td class="left">2</td>
 					<td class="left">1</td>
                     <td class="left">1</td>
-                    <td class="left">(4)</td>
-                    <td class="left"></td>
+                    <td class="left"><span class="bracket">(</span>4<span class="bracket">)</span></td>
                     <td class="left">2</td>
-					<td>12.0</td>
+					<td>12</td>
                    <td>2</td>
 				</tr>
 				
@@ -173,20 +198,19 @@
                     <td bgcolor="#666666"></td>
 					<td class="member">Горев Р.</td>
 					 <td>1.0</td>
-					 <td>KAZHDY</td>
+					 <td class="boat_name">Kazhdy</td>
 					 <td>4</td>
 					 
-					<td class="left"></td>
+					<td class="left">2</td>
 					<td class="left">1</td>
 					<td class="left">1</td>
 					<td class="left">3</td>
-					<td class="left">(6)</td>
+					<td class="left"><span class="bracket">(</span>6<span class="bracket">)</span></td>
                     <td class="left">5</td>
-                    <td class="left">(7)</td>
+                    <td class="left"><span class="bracket">(</span>7<span class="bracket">)</span></td>
                     <td class="left">2</td>
-                    <td class="left"></td>
                     <td class="left">3</td>
-					<td>15.0</td>
+					<td>15</td>
                    <td>3</td>
 				</tr>
 				
@@ -196,20 +220,19 @@
                     <td bgcolor="#796263"></td>
 					<td class="member">Овсянников Д.</td>
 					<td>1.0</td>
-					<td>VOSMOY</td>
+					<td class="boat_name">Vosmoy</td>
 					<td>3</td>
 					
-					<td class="left"></td>
+					<td class="left">5</td>
 					<td class="left">5</td>
 					<td class="left">4</td>
 					<td class="left">2</td>
-					<td class="left">(10)</td>
+					<td class="left"><span class="bracket">(</span>10<span class="bracket">)</span></td>
                     <td class="left">3</td>
-                    <td class="left">(6)</td>
+                    <td class="left"><span class="bracket">(</span>6<span class="bracket">)</span></td>
                     <td class="left">3</td>
-                    <td class="left"></td>
                     <td class="left">4</td>
-					<td>21.0</td>
+					<td>21</td>
                     <td>4</td>
 				</tr>
 				
@@ -219,20 +242,19 @@
                     <td bgcolor="#7BAFFD"></td>
 					<td class="member">Чайкин М.</td>
 					<td>1.0</td>
-					<td>GDJE</td>
+					<td class="boat_name">Gdje</td>
 					<td>2</td>
 					
-					<td class="left"></td>
+					<td class="left">3</td>
 					<td class="left">7</td>
-					<td class="left">(9)</td>
+					<td class="left"><span class="bracket">(</span>9<span class="bracket">)</span></td>
 					<td class="left">4</td>
 					<td class="left">3</td>
                     <td class="left">4</td>
-                    <td class="left">(11)</td>
+                    <td class="left"><span class="bracket">(</span>11<span class="bracket">)</span></td>
                     <td class="left">9</td>
-                    <td class="left"></td>
                     <td class="left">8</td>
-					<td>35.0</td>
+					<td>35</td>
                     <td>5</td>
                 </tr>
 				
@@ -242,20 +264,19 @@
                     <td bgcolor="#FF9900"></td>
                     <td class="member">Кулаков А.</td>
 					<td>1.0</td>
-					<td>OKHOTNIK</td>
+					<td class="boat_name">Okhotnik</td>
 					<td>9</td>
 					
-					<td class="left"></td>
+					<td class="left">6</td>
 					<td class="left">8</td>
 					<td class="left">6</td>
 					<td class="left">5</td>
 					<td class="left">7</td>
-                    <td class="left">(11)</td>
-                    <td class="left">(12)</td>
+                    <td class="left"><span class="bracket">(</span>11<span class="bracket">)</span></td>
+                    <td class="left"><span class="bracket">(</span>12<span class="bracket">)</span></td>
                     <td class="left">6</td>
-                    <td class="left"></td>
                     <td class="left">7</td>
-					<td>39.0</td>
+					<td>39</td>
                     <td>6</td>
 				</tr>
 				
@@ -265,20 +286,19 @@
                     <td bgcolor="#f7f791"></td>
 					<td class="member">Воронов</td>
 					<td>1.0</td>
-					<td>ZHELAET</td>
+					<td class="boat_name">Zhelaet</td>
 					<td>8</td>
 					
-					<td class="left"></td>
+					<td class="left">7</td>
 					<td class="left">2</td>
 					<td class="left">5</td>
-					<td class="left">(12)</td>
+					<td class="left"><span class="bracket">(</span>12<span class="bracket">)</span></td>
 					<td class="left">11</td>
                     <td class="left">8</td>
                     <td class="left">8</td>
                     <td class="left">7</td>
-                    <td class="left"></td>
-                    <td class="left">(16<small> нф)</small></td>
-					<td>41.0</td>
+                    <td class="left"><span class="bracket">(</span>16<span class="bracket">)</span> <small>нф</small></td>
+					<td>41</td>
                     <td>7</td>
 				</tr>
 				
@@ -288,20 +308,19 @@
                     <td bgcolor="#669900"></td>
 					<td class="member">Мовчан С.</td>
 					<td>1.0</td>
-					<td>ZNAT</td>
+					<td class="boat_name">Znat</td>
 					<td>10</td>
 					
-					<td class="left"></td>
+					<td class="left">8</td>
 					<td class="left">4</td>
-					<td class="left">(10)</td>
+					<td class="left"><span class="bracket">(</span>10<span class="bracket">)</span></td>
 					<td class="left">10</td>
-					<td class="left">(16<small> нф)</small></td>
+					<td class="left"><span class="bracket">(</span>16<span class="bracket">)</span> <small>нф</small></td>
                     <td class="left">7</td>
                     <td class="left">4</td>
                     <td class="left">10</td>
-                    <td class="left"></td>
                     <td class="left">6</td>
-					<td>41.0</td>
+					<td>41</td>
                     <td>8</td>
 				</tr>
 				
@@ -311,20 +330,19 @@
                     <td bgcolor="#0099CC"></td>
 					<td class="member">Нароженко Д.</td>
 					<td>1.04</td>
-					<td>SUPERTRAMP</td>
+					<td class="boat_name">Supertramp</td>
 					<td>11</td>
 					
-					<td class="left"></td>
+					<td class="left">16 нф</td>
 					<td class="left">6</td>
 					<td class="left">8</td>
 					<td class="left">8</td>
 					<td class="left">5</td>
-                    <td class="left">(12)</td>
+                    <td class="left"><span class="bracket">(</span>12<span class="bracket">)</span></td>
                     <td class="left">9</td>
-                    <td class="left">(14)</td>
-                    <td class="left"></td>
+                    <td class="left"><span class="bracket">(</span>14<span class="bracket">)</span></td>
                     <td class="left">5</td>
-					<td>41.0</td>
+					<td>41</td>
                     <td>9</td>
 				</tr>
 				
@@ -334,20 +352,19 @@
                     <td bgcolor="#E0A86F"></td>
                     <td class="member">Жарков</td>
 					<td>0.97</td>
-					<td>MAJA III</td>
+					<td class="boat_name">Maja III</td>
 					<td>1</td>
 					
-					<td class="left"></td>
+					<td class="left">9</td>
                     <td class="left">10</td>
-					<td class="left">(11)</td>
+					<td class="left"><span class="bracket">(</span>11<span class="bracket">)</span></td>
 					<td class="left">9</td>
 					<td class="left">4</td>
                     <td class="left">9</td>
                     <td class="left">5</td>
                     <td class="left">5</td>
-                    <td class="left"></td>
-                    <td class="left">(16<small> нф)</small></td>
-                    <td>42.0</td>
+                    <td class="left"><span class="bracket">(</span>16<span class="bracket">)</span> <small>нф</small></td>
+                    <td>42</td>
                     <td>10</td>
                 </tr>
 				
@@ -357,20 +374,19 @@
                     <td bgcolor="#FFFFFF"></td>
 					<td class="member">Васильев А.</td>
 					<td>1.0</td>
-					<td>DISIATI</td>
+					<td class="boat_name">Disiati</td>
 					<td>13</td>
 					
-					<td class="left"></td>
+					<td class="left">16 нф</td>
 					<td class="left">9</td>
 					<td class="left">7</td>
 					<td class="left">7</td>
 					<td class="left">9</td>
-                    <td class="left">(10)</td>
+                    <td class="left"><span class="bracket">(</span>10<span class="bracket">)</span></td>
                     <td class="left">3</td>
                     <td class="left">8</td>
-                    <td class="left"></td>
-                    <td class="left">(16<small> нф)</small></td>
-					<td>43.0</td>
+                    <td class="left"><span class="bracket">(</span>16<span class="bracket">)</span> <small>нф</small></td>
+					<td>43</td>
 					<td>11</td>
 				</tr>
 				
@@ -380,20 +396,19 @@
                     <td bgcolor="#990033"></td>
 					<td class="member">Яровой Д.</td>
 					<td>0.97</td>
-					<td>GINGER</td>
+					<td class="boat_name">Ginger</td>
 					<td>5</td>
 					
-					<td class="left"></td>
-					<td class="left">(16<small> нф)</small></td>
+					<td class="left">16 нф</td>
+					<td class="left"><span class="bracket">(</span>16<span class="bracket">)</span> <small>нф</small></td>
 					<td class="left">12</td>
 					<td class="left">13</td>
 					<td class="left">8</td>
                     <td class="left">13</td>
                     <td class="left">10</td>
                     <td class="left">11</td>
-                    <td class="left"></td>
-                    <td class="left">(16<small> нф)</small></td>
-					<td>67.0</td>
+                    <td class="left"><span class="bracket">(</span>16<span class="bracket">)</span> <small>нф</small></td>
+					<td>67</td>
                     <td>12</td>
 				</tr>
 
@@ -404,20 +419,19 @@
                     <td bgcolor="#68CEFD"></td>
 					<td class="member">Подколзин А.</td>
 					<td>1.0</td>
-					<td>PALOAMA III</td>
+					<td class="boat_name">Paloama III</td>
 					<td>7</td>
 					
-					<td class="left"></td>
+					<td class="left">10</td>
 					<td class="left">11</td>
-					<td class="left">(16<small> дск)</small></td>
+					<td class="left"><span class="bracket">(</span>16<span class="bracket">)</span> <small>дск</small></td>
 					<td class="left">11</td>
-					<td class="left">(16<small> нф)</small></td>
+					<td class="left"><span class="bracket">(</span>16<span class="bracket">)</span> <small>нф</small></td>
                     <td class="left">6</td>
                     <td class="left">13</td>
                     <td class="left">12</td>
-                    <td class="left"></td>
                     <td class="left">16<small> нф</small></td>
-					<td>69.0</td>
+					<td>69</td>
                     <td>13</td>
 				</tr>
 				
@@ -425,22 +439,21 @@
 					
 					
                     <td bgcolor="#CC3333"></td>
-					<td class="member">Подгородецкий П.</td>
+					<td class="member">Подгородецкий</td>
 					<td>0.97</td>
-					<td>ARTEMIDE</td>
+					<td class="boat_name">Artemide</td>
 					<td>12</td>
 					
 					<td class="left"></td>
-					<td class="left">(16<small> нф)</small></td>
+					<td class="left"><span class="bracket">(</span>16<span class="bracket">)</span> <small>нф</small></td>
 					<td class="left">13</td>
-					<td class="left">(16<small> нф)</small></td>
-					<td class="left">16<small> (нф)</small></td>
+					<td class="left"><span class="bracket">(</span>16<span class="bracket">)</span> <small>нф</small></td>
+					<td class="left"><span class="bracket">(</span>16<span class="bracket">)</span> <small>нф</small></td>
                     <td class="left">14</td>
                     <td class="left">14</td>
                     <td class="left">13</td>
-                    <td class="left"></td>
                     <td class="left">16<small> нф</small></td>
-					<td>86.0</td>
+					<td>86</td>
                     <td>14</td>
 				</tr>
 
@@ -450,20 +463,19 @@
                     <td bgcolor="#330066"></td>
 					<td class="member">Тихий М.</td>
 					<td>1.0</td>
-					<td>SIDIT</td>
+					<td class="boat_name">Sidit</td>
 					<td>14</td>
 					
-					<td class="left"></td>
-					<td class="left">(16<small> нф)</small></td>
-					<td class="left">(16 <small>фс)</small></td>
+					<td class="left">16 нф</td>
+					<td class="left"><span class="bracket">(</span>16<span class="bracket">)</span> <small>нф</small></td>
+					<td class="left"><span class="bracket">(</span>16<span class="bracket">)</span> <small>нф</small></td>
 					<td class="left">14</td>
 					<td class="left">16<small> нф</small></td>
                     <td class="left">16<small> нс</small></td>
                     <td class="left">16<small> нс</small></td>
                     <td class="left">16<small> нс</small></td>
-                    <td class="left"></td>
                     <td class="left">16<small> нф</small></td>
-					<td>94.0</td>
+					<td>94</td>
                     <td>15</td>
 				</tr>
 				

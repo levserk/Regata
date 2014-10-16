@@ -37,6 +37,17 @@ $(document).ready(function(){
 				success: function(data) {				
 					$('.on-line').html(data);
                     $('#player-panel').hide();
+					
+					
+					//костыль
+					
+					$('.ReadyRace').bind('click', function(){
+                        loadRace($(this).attr('id'));
+					});
+					
+					////////////
+					
+					
 					$('div.table-regata .show').bind('click', function(){	
 						$('.wrap').hide();	
 						$('#btn_back').show();
@@ -120,7 +131,9 @@ $(document).ready(function(){
             clearInterval(updateInterval);
 			$('.top-button').removeClass('top-button-yellow');
 			$(this).addClass('top-button-yellow');	
-			that.getRace();	
+			that.getRace();
+            _fNotRelocate = true;
+            _fcutTracks = true;
 		});
 		
 				
@@ -233,7 +246,7 @@ $(document).ready(function(){
 				data:{type:'ReadyRaceList'},
 				success: function(data) {
 					$('.on-line').html(data);
-					 $('#player-panel').hide();
+					$('#player-panel').hide();
 					$('.ReadyRace').bind('click', function(){
                         loadRace($(this).attr('id'));
 					});
